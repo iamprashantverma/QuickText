@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/quicktextdb
+      database: QuickText
+
+# Optional: logging for MongoDB queries
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG

@@ -3,6 +3,7 @@ package com.prashant.quicktext.server.util;
 import java.security.SecureRandom;
 
 public class AppUtil {
+
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final SecureRandom RANDOM = new SecureRandom();
 

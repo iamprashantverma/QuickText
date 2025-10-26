@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/* Global styles */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom Textarea Styles */
+textarea {
+  font-family: 'Courier New', monospace;
+}
+
+textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Rich Text Editor Styles */
+[contenteditable="true"],
+[contenteditable="true"] * {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[contenteditable="true"] {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  unicode-bidi: embed !important;
+}
+
+[contenteditable="true"]:empty:before {
+  content: attr(placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+[contenteditable="true"]::-webkit-scrollbar {
+  width: 8px;
+}
+
+[contenteditable="true"]::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+[contenteditable="true"]::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+[contenteditable="true"]::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Formatting styles */
+[contenteditable="true"] strong {
+  font-weight: bold;
+}
+
+[contenteditable="true"] em {
+  font-style: italic;
+}
+
+[contenteditable="true"] u {
+  text-decoration: underline;
+}
+
+/* Content editable empty state */
+[contenteditable="true"]:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  direction: ltr;
+  text-align: left;
+  pointer-events: none;
+}
+
+/* TipTap Editor Styles */
+.tiptap-editor {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+.tiptap-editor p {
+  margin: 0.5rem 0;
+}
+
+.tiptap-editor p.is-editor-empty:first-child::before {
+  content: "Start typing or paste your text here...";
+  color: #9ca3af;
+  pointer-events: none;
+  float: left;
+}
+
+.ProseMirror {
+  outline: none;
+  min-height: 300px;
+  padding: 0.75rem;
+}
+
+.ProseMirror * {
+  direction: ltr !important;
+  text-align: left !important;
+}

@@ -2,10 +2,15 @@ package com.prashant.quicktext.server.repository;
 
 import com.prashant.quicktext.server.entity.TextShare;
 import org.springframework.data.mongodb.repository.MongoRepository;
+
 import org.springframework.stereotype.Repository;
+
+
+import java.util.Optional;
 
 @Repository
 public interface TextShareRepository extends MongoRepository<TextShare,String> {
 
-    boolean existsByLink(String link);
+    Optional<TextShare> findByLink(String link);
+    Boolean existsByLink(String generatedLink);
 }

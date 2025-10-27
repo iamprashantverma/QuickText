@@ -107,8 +107,8 @@ const CreateTextPage = () => {
   return (
     <div className={`min-h-screen py-6 sm:py-8 px-4 ${
       theme === 'dark' 
-        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+        ? 'bg-linear-to-br from-gray-900 to-gray-800' 
+        : 'bg-linear-to-br from-blue-50 to-indigo-100'
     }`}>
       <div className="max-w-5xl mx-auto">
         {/* Header */}
@@ -254,9 +254,9 @@ const CreateTextPage = () => {
                 {isCustomExpiration && (
                   <input
                   type="text"
-                  value={customLink}
+                  value={customExpirationMinutes}
                   onChange={(e) => setCustomExpirationMinutes(e.target.value)}
-                  placeholder="quicktext/prashant-note"
+                  placeholder="minutes "
                   className={`w-24 px-2 py-1 border rounded-lg focus:ring-2 outline-none text-xs sm:text-sm ${
                     theme === 'dark'
                       ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'

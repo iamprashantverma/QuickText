@@ -11,8 +11,8 @@ const Home = () => {
   return (
     <div className={`min-h-screen ${
       theme === 'dark' 
-        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+        ? 'bg-linear-to-br from-gray-900 to-gray-800' 
+        : 'bg-linear-to-br from-blue-50 to-indigo-100'
     }`}>
       {/* Header Section */}
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -97,7 +97,7 @@ const Home = () => {
               <div className={`rounded-lg shadow-md p-4 transform transition-all hover:scale-105 ${
                 theme === 'dark' ? 'bg-gray-800' : 'bg-white'
               }`}>
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-3">
               <span className="text-xl sm:text-2xl">🎨</span>
             </div>
                 <h3 className={`text-base sm:text-lg font-semibold mb-2 ${
@@ -111,7 +111,7 @@ const Home = () => {
           <div className={`rounded-lg shadow-md p-4 transform transition-all hover:scale-105 ${
             theme === 'dark' ? 'bg-gray-800' : 'bg-white'
           }`}>
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mb-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mb-3">
               <span className="text-xl sm:text-2xl">⏱️</span>
             </div>
                 <h3 className={`text-base sm:text-lg font-semibold mb-2 ${
@@ -125,7 +125,7 @@ const Home = () => {
           <div className={`rounded-lg shadow-md p-4 transform transition-all hover:scale-105 ${
             theme === 'dark' ? 'bg-gray-800' : 'bg-white'
           }`}>
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center mb-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center mb-3">
               <span className="text-xl sm:text-2xl">🔒</span>
             </div>
                 <h3 className={`text-base sm:text-lg font-semibold mb-2 ${

@@ -50,8 +50,8 @@ const LoginPage = () => {
     <div
       className={`min-h-screen py-6 sm:py-8 px-4 ${
         theme === 'dark'
-          ? 'bg-gradient-to-br from-gray-900 to-gray-800'
-          : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+          ? 'bg-linear-to-br from-gray-900 to-gray-800'
+          : 'bg-linear-to-br from-blue-50 to-indigo-100'
       }`}
     >
       <div className="max-w-md mx-auto">

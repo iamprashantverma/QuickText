@@ -56,6 +56,7 @@ public class TextShareServiceImpl implements TextShareService {
         } else if (textShareDTO.getExpirationMinutes() != null && textShareDTO.getExpirationMinutes() > 0) {
             LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(textShareDTO.getExpirationMinutes());
             textShare.setExpirationTime(expiresAt);
+            textShare.setViewCount(0L);
         }
 
         //  Save entity and return DTO
@@ -64,12 +65,44 @@ public class TextShareServiceImpl implements TextShareService {
     }
 
 
+
     @Override
-    public TextShareDTO getTextById(String id) {
-        TextShare entity = textShareRepository.findById(id)
-                .orElseThrow(() -> new TextNotFoundException("Text content not found for id: " + id));
-        return convertToTextShareDTO(entity);
+    @Transactional
+    public TextShareDTO getTextById(String link) {
+        log.info("Fetching text content for link: {}", link);
+
+        TextShare textShare = textShareRepository.findByLink(link)
+                .orElseThrow(() -> {
+                    log.warn("No content found for link: {}", link);
+                    return new TextNotFoundException("Invalid or broken link.");
+                });
+
+        LocalDateTime now = LocalDateTime.now();
+
+        boolean notExpired = textShare.getExpirationTime() == null || textShare.getExpirationTime().isAfter(now);
+        boolean oneTimeValid = Boolean.TRUE.equals(textShare.getOneTimeView()) && Boolean.FALSE.equals(textShare.getViewed());
+
+        // Validate the link
+        if (!notExpired && !oneTimeValid) {
+            log.warn("Link {} is expired or already viewed.", link);
+            throw new TextNotFoundException("Invalid or broken link.");
+        }
+
+        // Handle one-time view
+        if (Boolean.TRUE.equals(textShare.getOneTimeView())) {
+            log.info("One-time view for link: {} — deleting after access.", link);
+            textShareRepository.delete(textShare);
+        } else {
+            // Increment view count safely
+            long newCount = textShare.getViewCount() == null ? 1L : textShare.getViewCount() + 1;
+            textShare.setViewCount(newCount);
+            textShareRepository.save(textShare);
+            log.info("Incremented view count for link {}: {}", link, newCount);
+        }
+
+        return convertToTextShareDTO(textShare);
     }
+
 
     @Override
     public List<TextShareDTO> getAllTexts() {
@@ -94,18 +127,16 @@ public class TextShareServiceImpl implements TextShareService {
     public ValidateLinkDTO validateCustomLink(ValidateLinkDTO validateLinkDTO) {
 
         String link = validateLinkDTO.getCustomLink();
-
         boolean exists = textShareRepository.existsByLink(link);
 
         return ValidateLinkDTO.builder()
                 .customLink(link)
-                .isAvailable(exists)
+                .isAvailable(!exists)
                 .message(exists
                         ? "This custom link is already taken. Please try another."
                         : "This custom link is available!")
                 .build();
     }
-
 
     private TextShare convertToTextShareEntity(TextShareDTO dto) {
         return modelMapper.map(dto, TextShare.class);

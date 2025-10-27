@@ -27,9 +27,9 @@ public class TextShareController {
         return new ResponseEntity<>(createdText, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TextShareDTO> getSharedText(@PathVariable String id) {
-        TextShareDTO text = textShareService.getTextById(id);
+    @GetMapping("/{link}")
+    public ResponseEntity<TextShareDTO> getSharedText(@PathVariable String link) {
+        TextShareDTO text = textShareService.getTextById(link);
         return ResponseEntity.ok(text);
     }
 

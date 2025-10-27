@@ -15,13 +15,21 @@ public class TextShare {
     @Id
     private String id;
 
-    private String contentHtml;
+    private String content;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
+    private Boolean oneTimeView;
+
+    private Boolean viewed;
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    private LocalDateTime expirationTime;
+
+    private String link;
 
     private  Long viewCount = 0L;
 

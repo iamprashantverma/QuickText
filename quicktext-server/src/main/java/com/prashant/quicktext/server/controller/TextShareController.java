@@ -1,9 +1,11 @@
 package com.prashant.quicktext.server.controller;
 
 import com.prashant.quicktext.server.dto.TextShareDTO;
+import com.prashant.quicktext.server.dto.ValidateLinkDTO;
 import com.prashant.quicktext.server.service.TextShareService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/texts")
 @RequiredArgsConstructor
+@Slf4j
+@CrossOrigin
 public class TextShareController {
 
     private final TextShareService textShareService;
@@ -47,5 +51,10 @@ public class TextShareController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/validate-link")
+    public ResponseEntity<ValidateLinkDTO> validateCustomLink(@Valid @RequestBody ValidateLinkDTO requestDTO) {
+        ValidateLinkDTO resp = textShareService.validateCustomLink(requestDTO);
+        return ResponseEntity.ok(resp);
+    }
 
 }

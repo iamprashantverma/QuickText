@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TextShareRepository extends MongoRepository<TextShare,String> {
 
+    boolean existsByLink(String link);
 }

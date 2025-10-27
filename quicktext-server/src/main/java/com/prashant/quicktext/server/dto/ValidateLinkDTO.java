@@ -11,4 +11,5 @@ public class ValidateLinkDTO {
     @NotBlank(message = "Custom link cannot be blank")
     private String customLink;
     private String message;
+    private Boolean isAvailable;
 }

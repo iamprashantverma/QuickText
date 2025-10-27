@@ -99,6 +99,7 @@ public class TextShareServiceImpl implements TextShareService {
 
         return ValidateLinkDTO.builder()
                 .customLink(link)
+                .isAvailable(exists)
                 .message(exists
                         ? "This custom link is already taken. Please try another."
                         : "This custom link is available!")

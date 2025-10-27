@@ -1,67 +1,51 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { AuthContext } from './AuthContext';
+import React, { createContext, useEffect, useState, useCallback } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; // define in .env
+import jwtDecode from "jwt-decode";
+
+import {loginService} from  '../../services/api';
+
+
+const AuthContext = createContext(null);
+
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState(() => localStorage.getItem("token"));
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-  // Auto-fetch user on mount if token exists
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) fetchUserProfile(token);
-    else setLoading(false);
-  }, []);
+    const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  
-  const fetchUserProfile = async (token) => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUser(response.data);
-    } catch (error) {
-      console.error('Failed to fetch user profile:', error);
-      localStorage.removeItem('token');
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const login = useCallback(async (credentials) => {
+        try {
+            setLoading(true);
+            const  resp  = await loginService(credentials); 
+            console.log(resp);
+            // setToken(token); 
+        } catch (err) {
+            console.error("Login failed:", err);
+            throw err; 
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-  /**
-   * Generic login method
-   * Accepts API endpoint and credentials
-   */
-  const login = async (endpoint, credentials) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}${endpoint}`, credentials);
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      setUser(user);
-      return { success: true };
-    } catch (error) {
-      console.error('Login failed:', error);
-      return { success: false, error: error.response?.data || error.message };
-    }
-  };
-
-  /**
-   * Logout user
-   */
-  const logout = () => {
-    localStorage.removeItem('token');
+    const logout = useCallback(() => {
     setUser(null);
-  };
+    setToken(null);
+    localStorage.removeItem("token");
+    }, []);
 
-  const value = {
+
+    const value = {
     user,
-    loading,
     login,
-    logout
-  };
-
+    logout,
+    };
+    if (loading) 
+        return <div> loading </div>
+        
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+
 };
+
+export default AuthContext;

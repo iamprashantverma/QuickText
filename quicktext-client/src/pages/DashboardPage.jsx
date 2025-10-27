@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 // Import environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -29,7 +29,14 @@ const DashboardPage = () => {
       const response = await axios.get(`${API_BASE_URL}/api/textshare/user`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setTextShares(response.data);
+      
+      // Handle Spring Boot APIResponse format
+      const apiResponse = response.data;
+      if (apiResponse.error) {
+        setError(apiResponse.error.message || 'Failed to fetch your text shares');
+      } else {
+        setTextShares(apiResponse.data || []);
+      }
     } catch (err) {
       setError('Failed to fetch your text shares');
     } finally {
@@ -42,10 +49,17 @@ const DashboardPage = () => {
     
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE_URL}/api/textshare/${shareId}`, {
+      const response = await axios.delete(`${API_BASE_URL}/api/textshare/${shareId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setTextShares(textShares.filter(share => share.id !== shareId));
+      
+      // Handle Spring Boot APIResponse format
+      const apiResponse = response.data;
+      if (apiResponse.error) {
+        setError(apiResponse.error.message || 'Failed to delete text share');
+      } else {
+        setTextShares(textShares.filter(share => share.id !== shareId));
+      }
     } catch (err) {
       setError('Failed to delete text share');
     }

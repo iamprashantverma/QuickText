@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { createText } from '../services/api/textService';
+import { validateCustomURL } from '../services/api/textService';
 
 const CreateTextPage = () => {
   const { user } = useAuth();
@@ -16,47 +17,92 @@ const CreateTextPage = () => {
   const [customExpirationMinutes, setCustomExpirationMinutes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isAvailable, setIsAvailable] = useState(null); 
   
-  // If one-time is selected, disable expiration options
   const isExpirationDisabled = oneTimeView;
-
-  const handleLogout = () => {
-    // Remove JWT token from localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    // Redirect to home page
-    window.location.href = '/';
-  };
 
   const generateLink = async () => {
     setError('');
     setLoading(true);
 
     try {
-      const link = customLink || null;
-      // If one-time is selected, don't send expiration
-      const expirationMinutes = oneTimeView ? null : (isCustomExpiration ? parseInt(customExpirationMinutes) : parseInt(expiration));
       
+      const expirationMinutes = oneTimeView
+        ? null
+        : (isCustomExpiration
+            ? parseInt(customExpirationMinutes) || null
+            : parseInt(expiration) || null);
+
+
       const payload = {
-        content,
-        customLink: link,
+        content: content.trim(),
         expirationMinutes,
         oneTimeView,
-        userId: user?.id
+        link: customLink.trim() || null,
       };
 
-      const token = localStorage.getItem('token');
-      const response = await axios.post(`${API_BASE_URL}/api/textshare/create`, payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      console.log("Generated Payload:", payload);
 
-      navigate(`/text/${response.data.shareId}`);
+      const response = await createText(payload);
+
+      console.log("Response:", response.data);
+
+      // navigate or show success (example)
+      // navigate(`/view/${response.data.link}`);
+
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create link');
+      let message = "Something went wrong. Please try again.";
+
+      if (err.response) {
+        message =
+          err.response.data?.error?.message ||
+          err.response.data?.message ||
+          "Server returned an error.";
+      } else if (err.request) {
+        message = "No response from server. Please check your internet connection.";
+      } else {
+        message = err.message;
+      }
+
+      console.error("Error:", message);
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!customLink) {
+      setIsAvailable(null);
+      return;
+    }
+    const validate = async () => {
+      try {
+        const resp = await validateCustomURL(customLink);
+        let flag = resp.data.data.isAvailable;
+        setIsAvailable(flag);
+      } catch (err) {
+          let message = "Something went wrong. Please try again.";
+
+        if (err.response) {
+          message =
+            err.response.data?.error?.message ||
+            err.response.data?.message ||
+            "Server returned an error.";
+        } else if (err.request) {
+          message = "No response from server. Please check your internet connection.";
+        } else {
+          message = err.message;
+        }
+
+        console.error("Error:", message);
+        setError(message);
+      } 
+    };
+
+    validate();
+  }, [customLink]);
+
 
   return (
     <div className={`min-h-screen py-6 sm:py-8 px-4 ${
@@ -98,12 +144,7 @@ const CreateTextPage = () => {
                 >
                   Dashboard
                 </button>
-                <button
-                  onClick={handleLogout}
-                  className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-xs sm:text-sm flex-1 sm:flex-none"
-                >
-                  Logout
-                </button>
+                
               </>
             ) : (
               <>
@@ -212,17 +253,17 @@ const CreateTextPage = () => {
                 </select>
                 {isCustomExpiration && (
                   <input
-                    type="number"
-                    value={customExpirationMinutes}
-                    onChange={(e) => setCustomExpirationMinutes(e.target.value)}
-                    placeholder="minutes"
-                    min="1"
-                    className={`w-20 sm:w-24 px-2 py-1 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-xs sm:text-sm ${
-                      theme === 'dark'
-                        ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                        : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                    }`}
-                  />
+                  type="text"
+                  value={customLink}
+                  onChange={(e) => setCustomExpirationMinutes(e.target.value)}
+                  placeholder="quicktext/prashant-note"
+                  className={`w-24 px-2 py-1 border rounded-lg focus:ring-2 outline-none text-xs sm:text-sm ${
+                    theme === 'dark'
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+
                 )}
               </div>
             )}
@@ -235,15 +276,22 @@ const CreateTextPage = () => {
               value={customLink}
               onChange={(e) => setCustomLink(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
               placeholder="quicktext/prashnat-note"
-              className={`flex-1 px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-xs sm:text-sm ${
-                theme === 'dark'
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-              }`}
+              className={`flex-1 px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 outline-none text-xs sm:text-sm
+                ${theme === 'dark'
+                  ? 'bg-gray-700 placeholder-gray-400'
+                  : 'bg-white placeholder-gray-500'}
+                ${
+                  isAvailable === null
+                    ? `${theme === 'dark' ? 'text-white border-gray-600 focus:ring-indigo-500' : 'text-gray-900 border-gray-300 focus:ring-indigo-500'}`
+                    : isAvailable
+                    ? 'border-green-500 text-green-600 focus:ring-green-500'
+                    : 'border-red-500 text-red-600 focus:ring-red-500'
+                }
+              `}
             />
             <button
               onClick={generateLink}
-              disabled={loading || !content.trim()}
+              disabled={loading || !content.trim() || (isAvailable != null && !isAvailable)}
               className="px-4 sm:px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap text-xs sm:text-sm"
             >
               {loading ? 'Generating...' : 'Generate Link'}

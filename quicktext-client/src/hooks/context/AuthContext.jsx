@@ -1,8 +1,6 @@
 import React, { createContext, useEffect, useState, useCallback } from "react";
-
-import jwtDecode from "jwt-decode";
-
-import {loginService} from  '../../services/api';
+import { jwtDecode } from "jwt-decode";
+import { loginService } from "../../services/api/authService";
 
 
 const AuthContext = createContext(null);
@@ -13,39 +11,48 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+   
+    useEffect(() => {
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                setUser(decodedToken);
+            } catch (error) {
+                console.error("Invalid token:", error);
+                setToken(null);
+                setUser(null);
+                localStorage.removeItem("token");
+            }
+        } else {
+            setUser(null);
+        }
+    }, [token]);
 
     const login = useCallback(async (credentials) => {
         try {
             setLoading(true);
-            const  resp  = await loginService(credentials); 
-            console.log(resp);
-            // setToken(token); 
-        } catch (err) {
-            console.error("Login failed:", err);
-            throw err; 
+            return await loginService(credentials);   
         } finally {
             setLoading(false);
         }
     }, []);
 
     const logout = useCallback(() => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("token");
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem("token");
     }, []);
 
-
     const value = {
-    user,
-    login,
-    logout,
+        user,
+        token,
+        login,
+        logout,
+        loading
     };
-    if (loading) 
-        return <div> loading </div>
-        
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-
+      
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+export { AuthContext };
 export default AuthContext;

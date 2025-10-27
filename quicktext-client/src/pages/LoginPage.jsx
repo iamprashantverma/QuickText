@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import {  Link } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
 
 const LoginPage = () => {
-  const navigate = useNavigate();
+  
   const { theme, toggleTheme } = useTheme();
   const { login } = useAuth();
+
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,36 +25,45 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const result = await login('/auth/login', formData);
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
-        setError(result.error?.message || 'Login failed');
-      }
+      const {data} = await login(formData);
+      console.log("Data :",data);
+      setFormData({email:'',password:''});
     } catch (err) {
-      setError('Login failed');
+      let message = "Something went wrong. Please try again.";
+      if (err.response)
+          message =  err.response.data?.error?.message;
+      else if (err.request)
+          message = "No response from server. Please check your internet connection or try again later.";
+      setError(message);
+
     } finally {
       setLoading(false);
     }
   };
 
+
   return (
-    <div className={`min-h-screen py-6 sm:py-8 px-4 ${
-      theme === 'dark' 
-        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
-    }`}>
+    <div
+      className={`min-h-screen py-6 sm:py-8 px-4 ${
+        theme === 'dark'
+          ? 'bg-gradient-to-br from-gray-900 to-gray-800'
+          : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+      }`}
+    >
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <h1 className={`text-2xl sm:text-3xl font-bold ${
-            theme === 'dark' ? 'text-white' : 'text-gray-800'
-          }`}>
-            {import.meta.env.VITE_APP_NAME || 'Quick'}<span className="text-indigo-600">Text</span>
+          <h1
+            className={`text-2xl sm:text-3xl font-bold ${
+              theme === 'dark' ? 'text-white' : 'text-gray-800'
+            }`}
+          >
+            {import.meta.env.VITE_APP_NAME || 'Quick'}
+            <span className="text-indigo-600">Text</span>
           </h1>
           <button
             onClick={toggleTheme}
@@ -68,22 +79,29 @@ const LoginPage = () => {
         </div>
 
         {/* Login Form */}
-        <div className={`rounded-xl shadow-lg p-6 sm:p-8 ${
-          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-        }`}>
+        <div
+          className={`rounded-xl shadow-lg p-6 sm:p-8 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}
+        >
           <div className="text-center mb-6">
-            <h2 className={`text-xl sm:text-2xl font-bold mb-2 ${
-              theme === 'dark' ? 'text-white' : 'text-gray-800'
-            }`}>
+            <h2
+              className={`text-xl sm:text-2xl font-bold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-800'
+              }`}
+            >
               Welcome Back
             </h2>
-            <p className={`text-sm ${
-              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-            }`}>
+            <p
+              className={`text-sm ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}
+            >
               Sign in to your account
             </p>
           </div>
 
+          {/* Error Display */}
           {error && (
             <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 rounded text-sm">
               <p className="text-red-800">{error}</p>
@@ -91,16 +109,19 @@ const LoginPage = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email Field */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                Username
+              <label
+                className={`block text-sm font-medium mb-2 ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}
+              >
+                Email
               </label>
               <input
                 type="text"
-                name="username"
-                value={formData.username}
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 required
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
@@ -108,14 +129,17 @@ const LoginPage = () => {
                     ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                     : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
                 }`}
-                placeholder="Enter your username"
+                placeholder="Enter your email"
               />
             </div>
 
+            {/* Password Field */}
             <div>
-              <label className={`block text-sm font-medium mb-2 ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}>
+              <label
+                className={`block text-sm font-medium mb-2 ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}
+              >
                 Password
               </label>
               <input
@@ -143,14 +167,18 @@ const LoginPage = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className={`text-sm ${
-              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-            }`}>
+            <p
+              className={`text-sm ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}
+            >
               Don't have an account?{' '}
               <Link
                 to="/signup"
                 className={`${
-                  theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-500'
+                  theme === 'dark'
+                    ? 'text-indigo-400 hover:text-indigo-300'
+                    : 'text-indigo-600 hover:text-indigo-500'
                 }`}
               >
                 Sign up

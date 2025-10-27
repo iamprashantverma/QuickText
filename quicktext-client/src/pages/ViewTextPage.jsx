@@ -4,7 +4,7 @@ import { useTheme } from '../hooks/useTheme';
 import axios from 'axios';
 
 // Import environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const ViewTextPage = () => {
   const { shareId } = useParams();
@@ -21,9 +21,16 @@ const ViewTextPage = () => {
   const fetchTextShare = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/textshare/${shareId}`);
-      setTextShare(response.data);
+      
+      // Handle Spring Boot APIResponse format
+      const apiResponse = response.data;
+      if (apiResponse.error) {
+        setError(apiResponse.error.message || 'Text share not found or expired');
+      } else {
+        setTextShare(apiResponse.data);
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Text share not found or expired');
+      setError(err.response?.data?.error?.message || err.response?.data?.message || 'Text share not found or expired');
     } finally {
       setLoading(false);
     }

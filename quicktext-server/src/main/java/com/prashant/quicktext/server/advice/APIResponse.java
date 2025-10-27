@@ -1,5 +1,5 @@
 package com.prashant.quicktext.server.advice;
-
+import  com.prashant.jobtracker.advices.APIError;
 import lombok.Data;
 
 import java.time.LocalDateTime;

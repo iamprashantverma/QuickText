@@ -1,14 +1,12 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import {  Link } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
-import { useAuth } from '../hooks/useAuth';
-
+import { signUp } from '../services/api/user';
 const SignupPage = () => {
-  const navigate = useNavigate();
+
   const { theme, toggleTheme } = useTheme();
-  const { login } = useAuth();
   const [formData, setFormData] = useState({
-    username: '',
+    name: '',
     email: '',
     password: ''
   });
@@ -28,25 +26,26 @@ const SignupPage = () => {
     setLoading(true);
 
     try {
-      const result = await login('/user/signup', formData);
-      if (result.success) {
-        alert('Registration successful! You are now logged in.');
-        navigate('/dashboard');
-      } else {
-        setError(result.error?.message || 'Registration failed');
-      }
+        const resp = await signUp(formData);
+        console.log(resp);
     } catch (err) {
-      setError('Registration failed');
+      console.log(err);
+        let message = "Something went wrong. Please try again.";
+        if (err.response)
+            message =  err.response.data?.error?.message;
+        else if (err.request)
+            message = "No response from server. Please check your internet connection or try again later.";
+        setError(message);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
   return (
     <div className={`min-h-screen py-6 sm:py-8 px-4 ${
       theme === 'dark' 
-        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+        ? 'bg-linear-to-br from-gray-900 to-gray-800' 
+        : 'bg-linear-to-br from-blue-50 to-indigo-100'
     }`}>
       <div className="max-w-md mx-auto">
         {/* Header */}
@@ -118,12 +117,12 @@ const SignupPage = () => {
               <label className={`block text-sm font-medium mb-2 ${
                 theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
               }`}>
-                Username
+                Name
               </label>
               <input
                 type="text"
-                name="username"
-                value={formData.username}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 required
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
@@ -131,7 +130,7 @@ const SignupPage = () => {
                     ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                     : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
                 }`}
-                placeholder="Choose a username"
+                placeholder="enter your name"
               />
             </div>
 

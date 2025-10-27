@@ -45,11 +45,12 @@ const CreateTextPage = () => {
 
       const response = await createText(payload);
 
+      const generatedl= response.data.data.link;
+
+      window.history.pushState({}, '', `/${generatedl}`);
+      setIsAvailable(null);
+      setCustomLink('');
       console.log("Response:", response.data);
-
-      // navigate or show success (example)
-      // navigate(`/view/${response.data.link}`);
-
     } catch (err) {
       let message = "Something went wrong. Please try again.";
 
@@ -263,7 +264,6 @@ const CreateTextPage = () => {
                       : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
                   }`}
                 />
-
                 )}
               </div>
             )}

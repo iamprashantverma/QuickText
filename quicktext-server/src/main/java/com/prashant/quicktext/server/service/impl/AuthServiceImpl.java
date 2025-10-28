@@ -46,13 +46,13 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        String refreshToken = jwtService.generateRefreshToken(user);
+        String accessToken = jwtService.generateAccessToken(user);
 
         log.info("User {} logged in successfully", user.getEmail());
 
         return LoginResponseDTO.builder()
                 .message("Login successful")
-                .token(refreshToken)
+                .token(accessToken)
                 .build();
     }
 

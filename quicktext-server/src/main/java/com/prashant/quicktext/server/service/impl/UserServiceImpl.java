@@ -11,6 +11,7 @@ import com.prashant.quicktext.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ public class UserServiceImpl implements UserService {
     public final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${profileUrl}")
+    private String profileUrl;
+
     @Override
     public UserResponseDTO createUser(UserRequestDTO request) {
         // Check if user already exists
@@ -40,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
         String hashPassword = passwordEncoder.encode(password);
         toBeCreated.setPassword(hashPassword);
-
+        toBeCreated.setProfileImageUrl(profileUrl);
         User saveduser = userRepository.save(toBeCreated);
 
         log.info("User registered successfully with id: {}", saveduser.getId());

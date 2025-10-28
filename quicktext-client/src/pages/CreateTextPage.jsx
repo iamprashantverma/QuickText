@@ -258,11 +258,14 @@ const CreateTextPage = () => {
                         type="number"
                         min="1"
                         step="1"
+                        max="21600"
                         value={customExpirationMinutes}
                         onChange={(e) => {
-                          const value = e.target.value;
-                          if (value === '' || (!isNaN(value) && parseInt(value) > 0)) {
-                            setCustomExpirationMinutes(value);
+                        const value = e.target.value;
+                        if ( value === '' || 
+                              (!isNaN(value) && parseInt(value) > 0 && parseInt(value) <= 21600)
+                            ) {
+                              setCustomExpirationMinutes(value);
                           }
                         }}
                         onKeyDown={(e) => {

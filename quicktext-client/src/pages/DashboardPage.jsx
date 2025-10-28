@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 // Import environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -47,22 +47,7 @@ const DashboardPage = () => {
   const handleDelete = async (shareId) => {
     if (!confirm('Are you sure you want to delete this text share?')) return;
     
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.delete(`${API_BASE_URL}/api/textshare/${shareId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      // Handle Spring Boot APIResponse format
-      const apiResponse = response.data;
-      if (apiResponse.error) {
-        setError(apiResponse.error.message || 'Failed to delete text share');
-      } else {
-        setTextShares(textShares.filter(share => share.id !== shareId));
-      }
-    } catch (err) {
-      setError('Failed to delete text share');
-    }
+   
   };
 
   const handleLogout = () => {

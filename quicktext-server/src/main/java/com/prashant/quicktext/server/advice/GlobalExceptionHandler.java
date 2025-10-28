@@ -1,10 +1,7 @@
 package com.prashant.quicktext.server.advice;
 
 import com.prashant.jobtracker.advices.APIError;
-import com.prashant.quicktext.server.exception.CustomLinkAlreadyExistsException;
-import com.prashant.quicktext.server.exception.InvalidCredentialsException;
-import com.prashant.quicktext.server.exception.UserAlreadyExistsException;
-import com.prashant.quicktext.server.exception.UserNotFoundException;
+import com.prashant.quicktext.server.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +49,16 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new APIResponse<>(error));
+    }
+    @ExceptionHandler(TextNotFoundException.class)
+    public ResponseEntity<APIResponse<?>> handleTextNotFoundException(TextNotFoundException ex) {
+        log.warn(" link is broken : {}", ex.getMessage());
+        APIError error = APIError.builder()
+                .status(HttpStatus.NOT_FOUND)
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new APIResponse<>(error));
     }
 

@@ -7,8 +7,9 @@ export const createText = async (textData) => {
 };
 
 
-export const getTextById = async (id) => {
-  return await axios.get(`${API_BASE_URL}/${id}`);
+export const getTextByLink = async (link) => {
+ 
+  return await axios.get(`${API_BASE_URL}/${link}`);
 };
 
 

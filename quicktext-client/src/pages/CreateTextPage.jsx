@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useEffect, useState, useRef } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { createText } from '../services/api/textService';
 import { validateCustomURL } from '../services/api/textService';
 
 const CreateTextPage = () => {
-  const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme,} = useTheme();
   const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [customLink, setCustomLink] = useState('');
@@ -21,8 +19,27 @@ const CreateTextPage = () => {
   const [isGenerated, setIsGenerated] = useState(false);
   const [generatedUrl, setGeneratedUrl] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   
   const isExpirationDisabled = oneTimeView;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const generateLink = async () => {
     setError('');
@@ -50,6 +67,7 @@ const CreateTextPage = () => {
 
       const generatedl = response.data.data.link;
       const url = `${window.location.origin}/${generatedl}`;
+      window.history.pushState({}, '', `${window.location.origin}/${generatedl}`);
       setGeneratedUrl(url);
       setIsGenerated(true);
       setShowPopup(true);
@@ -182,46 +200,90 @@ const CreateTextPage = () => {
 
             {/* Expiration Dropdown - Disabled if one-time is selected */}
             {!oneTimeView && (
-              <div className="flex items-center gap-2">
-                <label htmlFor="expiration" className={`cursor-pointer ${
-                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-                }`}>Expires in:</label>
-                <select
-                  id="expiration"
-                  value={isCustomExpiration ? 'custom' : expiration}
-                  onChange={(e) => {
-                    if (e.target.value === 'custom') {
-                      setIsCustomExpiration(true);
-                    } else {
-                      setIsCustomExpiration(false);
-                      setExpiration(e.target.value);
-                    }
-                  }}
-                  disabled={isExpirationDisabled}
-                  className={`px-2 py-1 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-xs sm:text-sm ${
-                    theme === 'dark'
-                      ? 'border-gray-600 bg-gray-700 text-white'
-                      : 'border-gray-300 bg-white text-gray-900'
-                  }`}
-                >
-                  <option value="never">Never</option>
-                  <option value="5">5 minutes</option>
-                  <option value="30">30 minutes</option>
-                  <option value="custom">Custom</option>
-                </select>
-                {isCustomExpiration && (
-                  <input
-                  type="text"
-                  value={customExpirationMinutes}
-                  onChange={(e) => setCustomExpirationMinutes(e.target.value)}
-                  placeholder="minutes "
-                  className={`w-24 px-2 py-1 border rounded-lg focus:ring-2 outline-none text-xs sm:text-sm ${
-                    theme === 'dark'
-                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                  }`}
-                />
-                )}
+              <div className="space-y-1.5">
+                <label htmlFor="expiration" className={`block text-xs font-medium ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Expiration Time</label>
+                <div ref={dropdownRef} className="relative flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    id="expiration"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    disabled={isExpirationDisabled}
+                    className={`flex-1 sm:flex-none sm:w-40 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-medium transition-all cursor-pointer flex items-center justify-between ${
+                      theme === 'dark'
+                        ? 'border-gray-600 bg-gray-700 text-white hover:border-gray-500'
+                        : 'border-gray-300 bg-white text-gray-900 hover:border-gray-400'
+                    }`}
+                  >
+                    <span>
+                      {isCustomExpiration ? 'Custom duration' : 
+                       expiration === 'never' ? 'Never expires' :
+                       expiration + ' minutes'}
+                    </span>
+                    <span>▼</span>
+                  </button>
+                  
+                  {isDropdownOpen && (
+                    <div className="absolute top-full left-0 z-50 mt-1 w-full sm:w-40 border rounded-lg shadow-lg overflow-hidden">
+                      <div className={`max-h-48 overflow-y-auto ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>
+                        {['never', '5', '30', 'custom'].map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => {
+                              if (opt === 'custom') {
+                                setIsCustomExpiration(true);
+                              } else {
+                                setIsCustomExpiration(false);
+                                setExpiration(opt);
+                              }
+                              setIsDropdownOpen(false);
+                            }}
+                            className={`w-full px-3 sm:px-4 py-2 text-xs sm:text-sm text-left hover:bg-indigo-100 ${
+                              theme === 'dark' ? 'text-white hover:bg-gray-600' : 'text-gray-900'
+                            } ${(opt === expiration && !isCustomExpiration) || (opt === 'custom' && isCustomExpiration) ? 'bg-indigo-600 text-white' : ''}`}
+                          >
+                            {opt === 'never' ? 'Never expires' :
+                             opt === 'custom' ? 'Custom duration' :
+                             opt + ' minutes'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {isCustomExpiration && (
+                    <div className="flex items-center gap-2 flex-1 sm:flex-none">
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={customExpirationMinutes}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || (!isNaN(value) && parseInt(value) > 0)) {
+                            setCustomExpirationMinutes(value);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
+                            e.preventDefault();
+                          }
+                        }}
+                        placeholder="Enter minutes"
+                        style={{ fontSize: 'clamp(0.875rem, 2.5vw, 1rem)' }}
+                        className={`w-full sm:w-28 px-2.5 sm:px-3 py-1.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-medium transition-all ${
+                          theme === 'dark'
+                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400 hover:border-gray-500'
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500 hover:border-gray-400'
+                        }`}
+                      />
+                      <span className={`text-sm font-medium whitespace-nowrap ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>min</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

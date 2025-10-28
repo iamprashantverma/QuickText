@@ -1,52 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
-import axios from 'axios';
-
-// Import environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+import { getTextByLink } from '../services/api/textService';
+import TextViewer from '../components/ui/TextViewer';
 
 const ViewTextPage = () => {
   const { shareId } = useParams();
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const [textShare, setTextShare] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    // Prevent double fetch in Strict Mode
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    
+    const fetchTextShare = async () => {
+      try {
+        const response = await getTextByLink(shareId);
+        const data = response.data?.data || response.data;
+        setTextShare(data);
+      } catch (err) {
+        console.log(err);
+        setError(err.response?.data?.error?.message || err.response?.data?.message || 'Text share not found or expired');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     fetchTextShare();
   }, [shareId]);
 
-  const fetchTextShare = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/api/textshare/${shareId}`);
-      
-      // Handle Spring Boot APIResponse format
-      const apiResponse = response.data;
-      if (apiResponse.error) {
-        setError(apiResponse.error.message || 'Text share not found or expired');
-      } else {
-        setTextShare(apiResponse.data);
-      }
-    } catch (err) {
-      setError(err.response?.data?.error?.message || err.response?.data?.message || 'Text share not found or expired');
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Link copied to clipboard!');
   };
 
   if (loading) {
     return (
       <div className={`min-h-screen py-6 sm:py-8 px-4 ${
         theme === 'dark' 
-          ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-          : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+          ? 'bg-linear-to-br from-gray-900 to-gray-800' 
+          : 'bg-linear-to-br from-blue-50 to-indigo-100'
       }`}>
         <div className="max-w-4xl mx-auto">
           <div className={`rounded-xl shadow-lg p-6 sm:p-8 ${
@@ -67,8 +66,8 @@ const ViewTextPage = () => {
     return (
       <div className={`min-h-screen py-6 sm:py-8 px-4 ${
         theme === 'dark' 
-          ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-          : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+          ? 'bg-linear-to-br from-gray-900 to-gray-800' 
+          : 'bg-linear-to-br from-blue-50 to-indigo-100'
       }`}>
         <div className="max-w-4xl mx-auto">
           <div className={`rounded-xl shadow-lg p-6 sm:p-8 ${
@@ -101,76 +100,16 @@ const ViewTextPage = () => {
   return (
     <div className={`min-h-screen py-6 sm:py-8 px-4 ${
       theme === 'dark' 
-        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+        ? 'bg-linear-to-br from-gray-900 to-gray-800' 
+        : 'bg-linear-to-br from-blue-50 to-indigo-100'
     }`}>
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-bold ${
-            theme === 'dark' ? 'text-white' : 'text-gray-800'
-          }`}>
-            {import.meta.env.VITE_APP_NAME || 'Quick'}<span className="text-indigo-600">Text</span>
-          </h1>
-          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
-            <button
-              onClick={toggleTheme}
-              className={`px-3 sm:px-4 py-2 rounded-lg transition text-xs sm:text-sm ${
-                theme === 'dark'
-                  ? 'bg-gray-700 text-white hover:bg-gray-600'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-              }`}
-              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-            >
-              {theme === 'dark' ? '☀️' : '🌙'}
-            </button>
-            <button
-              onClick={copyToClipboard}
-              className="px-3 sm:px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-xs sm:text-sm flex-1 sm:flex-none"
-            >
-              Copy Link
-            </button>
-            <button
-              onClick={() => navigate('/')}
-              className="px-3 sm:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-xs sm:text-sm flex-1 sm:flex-none"
-            >
-              Home
-            </button>
-          </div>
-        </div>
-
-        {/* Text Content */}
-        <div className={`rounded-xl shadow-lg p-4 sm:p-6 ${
-          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-        }`}>
-          <div className="mb-4">
-            <h2 className={`text-lg font-semibold mb-2 ${
-              theme === 'dark' ? 'text-white' : 'text-gray-800'
-            }`}>
-              Shared Text Content
-            </h2>
-            <div className={`p-4 rounded-lg border ${
-              theme === 'dark' 
-                ? 'bg-gray-700 border-gray-600 text-white' 
-                : 'bg-gray-50 border-gray-200 text-gray-900'
-            }`}>
-              <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                {textShare.content}
-              </pre>
-            </div>
-          </div>
-
-          <div className={`text-sm ${
-            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-          }`}>
-            <p>Share ID: {textShare.shareId}</p>
-            <p>Views: {textShare.viewCount || 0}</p>
-            <p>Created: {new Date(textShare.createdAt).toLocaleString()}</p>
-            {textShare.expiresAt && (
-              <p>Expires: {new Date(textShare.expiresAt).toLocaleString()}</p>
-            )}
-          </div>
-        </div>
+        <TextViewer
+          theme={theme}
+          textShare={textShare}
+          onCopy={copyToClipboard}
+          onBack={() => navigate('/')}
+        />
       </div>
     </div>
   );

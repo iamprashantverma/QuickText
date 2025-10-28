@@ -22,7 +22,7 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             {/* removed /create route */}
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/text/:shareId" element={<ViewTextPage />} />
+            <Route path="/:shareId" element={<ViewTextPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>

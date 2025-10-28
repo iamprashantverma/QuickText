@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -14,6 +15,5 @@ public interface TextShareRepository extends MongoRepository<TextShare,String> {
 
     Optional<TextShare> findByLink(String link);
     Boolean existsByLink(String generatedLink);
-
-    int deleteByExpirationTimeBefore(LocalDateTime now);
+    List<TextShare> findByExpirationTimeBefore(LocalDateTime now);
 }

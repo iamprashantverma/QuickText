@@ -64,8 +64,6 @@ public class TextShareServiceImpl implements TextShareService {
         return convertToTextShareDTO(savedTextShare);
     }
 
-
-
     @Override
     @Transactional
     public TextShareDTO getTextById(String link) {
@@ -102,7 +100,6 @@ public class TextShareServiceImpl implements TextShareService {
 
         return convertToTextShareDTO(textShare);
     }
-
 
     @Override
     public List<TextShareDTO> getAllTexts() {

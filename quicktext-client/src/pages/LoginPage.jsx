@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const LoginPage = () => {
   
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const { login } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -55,28 +55,6 @@ const LoginPage = () => {
       }`}
     >
       <div className="max-w-md mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1
-            className={`text-2xl sm:text-3xl font-bold ${
-              theme === 'dark' ? 'text-white' : 'text-gray-800'
-            }`}
-          >
-            {import.meta.env.VITE_APP_NAME || 'Quick'}
-            <span className="text-indigo-600">Text</span>
-          </h1>
-          <button
-            onClick={toggleTheme}
-            className={`px-3 py-2 rounded-lg transition text-sm ${
-              theme === 'dark'
-                ? 'bg-gray-700 text-white hover:bg-gray-600'
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-            }`}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </button>
-        </div>
 
         {/* Login Form */}
         <div

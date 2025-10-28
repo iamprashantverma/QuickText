@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/texts")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin
@@ -21,7 +20,7 @@ public class TextShareController {
 
     private final TextShareService textShareService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<TextShareDTO> createSharedText(@Valid  @RequestBody TextShareDTO textShareDTO) {
         TextShareDTO createdText = textShareService.createText(textShareDTO);
         return new ResponseEntity<>(createdText, HttpStatus.CREATED);

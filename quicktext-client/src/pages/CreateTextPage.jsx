@@ -18,6 +18,9 @@ const CreateTextPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isAvailable, setIsAvailable] = useState(null); 
+  const [isGenerated, setIsGenerated] = useState(false);
+  const [generatedUrl, setGeneratedUrl] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
   
   const isExpirationDisabled = oneTimeView;
 
@@ -45,9 +48,12 @@ const CreateTextPage = () => {
 
       const response = await createText(payload);
 
-      const generatedl= response.data.data.link;
-
-      window.history.pushState({}, '', `/${generatedl}`);
+      const generatedl = response.data.data.link;
+      const url = `${window.location.origin}/${generatedl}`;
+      setGeneratedUrl(url);
+      setIsGenerated(true);
+      setShowPopup(true);
+      setTimeout(() => setShowPopup(false), 2000);
       setIsAvailable(null);
       setCustomLink('');
       console.log("Response:", response.data);
@@ -112,57 +118,6 @@ const CreateTextPage = () => {
         : 'bg-linear-to-br from-blue-50 to-indigo-100'
     }`}>
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-bold ${
-            theme === 'dark' ? 'text-white' : 'text-gray-800'
-          }`}>
-            {import.meta.env.VITE_APP_NAME || 'Quick'}<span className="text-indigo-600">Text</span>
-          </h1>
-          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
-            {/* Theme Toggle - Only in header */}
-            <button
-              onClick={toggleTheme}
-              className={`px-3 sm:px-4 py-2 rounded-lg transition text-xs sm:text-sm ${
-                theme === 'dark'
-                  ? 'bg-gray-700 text-white hover:bg-gray-600'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-              }`}
-              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-            >
-              {theme === 'dark' ? '☀️' : '🌙'}
-            </button>
-            
-            {user ? (
-              <>
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className={`px-3 sm:px-4 py-2 rounded-lg transition text-xs sm:text-sm flex-1 sm:flex-none ${
-                    theme === 'dark'
-                      ? 'bg-gray-700 text-white hover:bg-gray-600'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  }`}
-                >
-                  Dashboard
-                </button>
-                
-              </>
-            ) : (
-              <>
-                  <button
-                    onClick={() => navigate('/login')}
-                    className={`px-3 sm:px-4 py-2 rounded-lg transition text-xs sm:text-sm w-full sm:w-auto ${
-                      theme === 'dark'
-                        ? 'bg-gray-700 text-white hover:bg-gray-600'
-                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                    }`}
-                  >
-                    Login
-                  </button>
-              </>
-            )}
-          </div>
-        </div>
 
         {/* Error Message */}
         {error && (
@@ -196,11 +151,13 @@ const CreateTextPage = () => {
                 direction: 'ltr',
                 textAlign: 'left'
               }}
+              readOnly={isGenerated}
             />
           </div>
         </div>
 
-        {/* Bottom Row: Settings + Generate Button */}
+        {/* Bottom Row: Settings + Generate Button (hide after generated) */}
+        {!isGenerated && (
         <div className={`rounded-xl shadow-lg p-3 sm:p-4 mb-4 ${
           theme === 'dark' ? 'bg-gray-800' : 'bg-white'
         }`}>
@@ -298,6 +255,46 @@ const CreateTextPage = () => {
             </button>
           </div>
         </div>
+        )}
+
+        {isGenerated && (
+          <div className={`rounded-xl shadow-lg p-4 mb-4 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
+            <div className="mb-2">
+              <p className={`${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'} text-sm font-semibold`}>Share</p>
+              <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-xs`}>Your link is ready. Copy and share it.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                readOnly
+                value={generatedUrl}
+                className={`flex-1 px-3 py-2 border rounded-lg text-xs sm:text-sm ${
+                  theme === 'dark' ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-900 border-gray-300'
+                }`}
+              />
+              <button
+                onClick={() => { navigator.clipboard.writeText(generatedUrl); setShowPopup(true); setTimeout(() => setShowPopup(false), 1200); }}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm"
+              >
+                Copy
+              </button>
+              <button
+                onClick={() => { setContent(''); setIsGenerated(false); setCustomLink(''); setIsCustomExpiration(false); setOneTimeView(false); setExpiration('30'); setCustomExpirationMinutes(''); navigate('/'); }}
+                className={`px-4 py-2 rounded-lg text-xs sm:text-sm ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'}`}
+              >
+                Create another
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showPopup && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded shadow-lg text-sm">
+            Link copied!
+          </div>
+        )}
       </div>
     </div>
   );

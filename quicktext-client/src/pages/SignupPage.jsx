@@ -4,7 +4,7 @@ import { useTheme } from '../hooks/useTheme';
 import { signUp } from '../services/api/user';
 const SignupPage = () => {
 
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -48,25 +48,6 @@ const SignupPage = () => {
         : 'bg-linear-to-br from-blue-50 to-indigo-100'
     }`}>
       <div className="max-w-md mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className={`text-2xl sm:text-3xl font-bold ${
-            theme === 'dark' ? 'text-white' : 'text-gray-800'
-          }`}>
-            {import.meta.env.VITE_APP_NAME || 'Quick'}<span className="text-indigo-600">Text</span>
-          </h1>
-          <button
-            onClick={toggleTheme}
-            className={`px-3 py-2 rounded-lg transition text-sm ${
-              theme === 'dark'
-                ? 'bg-gray-700 text-white hover:bg-gray-600'
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-            }`}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </button>
-        </div>
 
         {/* Signup Form */}
         <div className={`rounded-xl shadow-lg p-6 sm:p-8 ${

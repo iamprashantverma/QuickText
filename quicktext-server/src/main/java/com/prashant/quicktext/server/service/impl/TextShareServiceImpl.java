@@ -2,15 +2,22 @@ package com.prashant.quicktext.server.service.impl;
 
 import com.prashant.quicktext.server.dto.TextShareDTO;
 import com.prashant.quicktext.server.dto.ValidateLinkDTO;
+import com.prashant.quicktext.server.entity.ArchivedText;
 import com.prashant.quicktext.server.entity.TextShare;
+import com.prashant.quicktext.server.entity.User;
 import com.prashant.quicktext.server.exception.CustomLinkAlreadyExistsException;
 import com.prashant.quicktext.server.exception.TextNotFoundException;
+import com.prashant.quicktext.server.repository.ArchivedTextRepository;
 import com.prashant.quicktext.server.repository.TextShareRepository;
+import com.prashant.quicktext.server.service.AuthService;
 import com.prashant.quicktext.server.service.TextShareService;
 import com.prashant.quicktext.server.util.AppUtil;
+import com.prashant.quicktext.server.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +31,8 @@ public class TextShareServiceImpl implements TextShareService {
 
     private final ModelMapper modelMapper;
     private final TextShareRepository textShareRepository;
+    private final AuthUtil authUtil;
+    private final ArchivedTextRepository archivedTextRepository;
 
     @Override
     @Transactional
@@ -58,7 +67,10 @@ public class TextShareServiceImpl implements TextShareService {
             textShare.setExpirationTime(expiresAt);
             textShare.setViewCount(0L);
         }
-
+        // fetch the current User if logged in
+        User currentUser = authUtil.getCurrentUser();
+        textShare.setUser(currentUser);
+        log.info("current User:{}",currentUser);
         //  Save entity and return DTO
         TextShare savedTextShare = textShareRepository.save(textShare);
         return convertToTextShareDTO(savedTextShare);
@@ -102,22 +114,32 @@ public class TextShareServiceImpl implements TextShareService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public List<TextShareDTO> getAllTexts() {
-        return List.of();
+        User user = authUtil.getCurrentUser();
+        if (user ==null)
+             throw new AuthorizationDeniedException("Your are not Authorized to perform this actions");
+
+        List<TextShare> textShares = textShareRepository.findAllByUser(user);
+
+        return textShares.stream()
+                .map(text -> modelMapper.map(text,TextShareDTO.class))
+                .toList();
     }
 
     @Override
-    public TextShareDTO updateText(String id, TextShareDTO textShareDTO) {
-        return null;
-    }
-
-    @Override
+    @Transactional
+    @PreAuthorize("@authServiceImpl.canDeleteText(#id)")
     public void deleteText(String id) {
         TextShare entity = textShareRepository.findById(id)
                 .orElseThrow(() -> new TextNotFoundException("Text content not found for id: " + id));
 
-        textShareRepository.delete(entity);
+        ArchivedText archivedText = modelMapper.map(entity,ArchivedText.class);
+        archivedText.setId(null);
+        archivedText.setDeleteReason("Self");
 
+        archivedTextRepository.save(archivedText);
+        textShareRepository.delete(entity);
     }
 
     @Override

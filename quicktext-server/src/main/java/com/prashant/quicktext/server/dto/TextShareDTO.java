@@ -1,5 +1,6 @@
 package com.prashant.quicktext.server.dto;
 
+import com.prashant.quicktext.server.entity.User;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -29,7 +30,7 @@ public class TextShareDTO {
     private String link;
 
     private Boolean oneTimeView;
-
+    private UserResponseDTO user;
     private Long viewCount;
 
 }

@@ -4,7 +4,14 @@ spring:
       uri: mongodb://localhost:27017/quicktextdb
       database: QuickText
 
-# Optional: logging for MongoDB queries
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
+jwt:
+  secretKey: "ads9f6ask3h4k1hf86asdfiahkjh34a789s6df89ayshkjh3jkh786ads78ay"
+
+cloudinary:
+  cloud-name: "dacxt4qjt"
+  api-key: "522395392912923"
+  api-secret: "0sRJKH16mAbdGnjyb8CuFVuuqNg"

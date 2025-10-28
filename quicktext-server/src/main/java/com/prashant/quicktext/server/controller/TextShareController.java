@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin
 public class TextShareController {
 
     private final TextShareService textShareService;
@@ -32,17 +31,12 @@ public class TextShareController {
         return ResponseEntity.ok(text);
     }
 
-    @GetMapping
+    @GetMapping("/texts")
     public ResponseEntity<List<TextShareDTO>> getAllSharedTexts() {
         List<TextShareDTO> texts = textShareService.getAllTexts();
         return ResponseEntity.ok(texts);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TextShareDTO> updateSharedText(@PathVariable String id, @RequestBody TextShareDTO textShareDTO) {
-        TextShareDTO updatedText = textShareService.updateText(id, textShareDTO);
-        return ResponseEntity.ok(updatedText);
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSharedText(@PathVariable String id) {

@@ -4,12 +4,15 @@ import com.prashant.quicktext.server.dto.UserRequestDTO;
 import com.prashant.quicktext.server.dto.UserResponseDTO;
 import com.prashant.quicktext.server.entity.User;
 import com.prashant.quicktext.server.exception.UserAlreadyExistsException;
+import com.prashant.quicktext.server.exception.UserNotFoundException;
 import com.prashant.quicktext.server.repository.UserRepository;
 
 import com.prashant.quicktext.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -21,7 +24,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     public final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
+    @Override
     public UserResponseDTO createUser(UserRequestDTO request) {
         // Check if user already exists
         userRepository.findByEmail(request.getEmail())
@@ -31,12 +36,22 @@ public class UserServiceImpl implements UserService {
                 });
 
         User toBeCreated = convertToUserEntity(request);
-        // hash the user password
+        String password = toBeCreated.getPassword();
+
+        String hashPassword = passwordEncoder.encode(password);
+        toBeCreated.setPassword(hashPassword);
 
         User saveduser = userRepository.save(toBeCreated);
 
         log.info("User registered successfully with id: {}", saveduser.getId());
         return convertToUserResponseDTO(saveduser);
+    }
+
+    @Override
+    public UserDetails getUserByEmail(String userEmail) {
+        return userRepository.findByEmail(userEmail).orElseThrow(
+                ()-> new UserNotFoundException("user not found with email:"+userEmail)
+        );
     }
 
     private User convertToUserEntity(UserRequestDTO requestDTO) {

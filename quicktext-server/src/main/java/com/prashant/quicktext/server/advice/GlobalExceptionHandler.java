@@ -5,6 +5,7 @@ import com.prashant.quicktext.server.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -89,4 +90,11 @@ public class GlobalExceptionHandler {
                 .body(new APIResponse<>(error));
     }
 
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<APIResponse<?>> handleAuthorizationDenied(AuthorizationDeniedException ex) {
+        log.warn("Authorization failed: {}", ex.getMessage());
+        APIError error = new APIError(HttpStatus.FORBIDDEN, "Access denied: You do not have permission to perform this action.");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new APIResponse<>(error));
+    }
 }

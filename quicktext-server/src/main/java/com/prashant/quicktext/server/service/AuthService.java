@@ -5,4 +5,5 @@ import com.prashant.quicktext.server.dto.LoginResponseDTO;
 
 public interface AuthService {
     LoginResponseDTO login(LoginRequestDTO loginRequestDTO);
+    Boolean canDeleteText(String id);
 }

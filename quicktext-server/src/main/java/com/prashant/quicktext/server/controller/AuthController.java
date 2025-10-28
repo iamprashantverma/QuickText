@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin
 public class AuthController {
 
     private final AuthService authService;

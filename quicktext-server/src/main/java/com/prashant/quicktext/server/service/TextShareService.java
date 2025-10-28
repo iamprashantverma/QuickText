@@ -15,7 +15,6 @@ public interface TextShareService {
 
     List<TextShareDTO> getAllTexts();
 
-    TextShareDTO updateText(String id, TextShareDTO textShareDTO);
 
     void deleteText(String id);
 

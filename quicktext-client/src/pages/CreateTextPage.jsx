@@ -5,6 +5,7 @@ import { createText } from '../services/api/textService';
 import { validateCustomURL } from '../services/api/textService';
 
 const CreateTextPage = () => {
+  
   const { theme,} = useTheme();
   const navigate = useNavigate();
   const [content, setContent] = useState('');
@@ -255,32 +256,40 @@ const CreateTextPage = () => {
                   {isCustomExpiration && (
                     <div className="flex items-center gap-2 flex-1 sm:flex-none">
                       <input
-                        type="number"
-                        min="1"
-                        step="1"
-                        max="21600"
-                        value={customExpirationMinutes}
-                        onChange={(e) => {
-                        const value = e.target.value;
-                        if ( value === '' || 
-                              (!isNaN(value) && parseInt(value) > 0 && parseInt(value) <= 21600)
+                          type="number"
+                          min="5"
+                          step="1"
+                          max="21600"
+                          value={customExpirationMinutes}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (
+                              value === '' ||
+                              (!isNaN(value) && parseInt(value) > 4 && parseInt(value) <= 21600)
                             ) {
                               setCustomExpirationMinutes(value);
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
-                            e.preventDefault();
-                          }
-                        }}
-                        placeholder="Enter minutes"
-                        style={{ fontSize: 'clamp(0.875rem, 2.5vw, 1rem)' }}
-                        className={`w-full sm:w-28 px-2.5 sm:px-3 py-1.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-medium transition-all ${
-                          theme === 'dark'
-                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400 hover:border-gray-500'
-                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500 hover:border-gray-400'
-                        }`}
-                      />
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
+                              e.preventDefault();
+                            }
+                          }}
+                          placeholder="Min 5"
+                          className={`
+                            w-full sm:w-28 px-2.5 sm:px-3 py-1.5 sm:py-2
+                            border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-medium transition-all
+                            text-[clamp(0.8rem,2vw,0.95rem)]
+                            placeholder:text-gray-400
+                            placeholder:text-[0.7rem] sm:placeholder:text-sm md:placeholder:text-[0.85rem] lg:placeholder:text-sm
+                            ${
+                              theme === 'dark'
+                                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400 hover:border-gray-500'
+                                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500 hover:border-gray-400'
+                            }
+                          `}
+                        />
+
                       <span className={`text-sm font-medium whitespace-nowrap ${
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                       }`}>min</span>

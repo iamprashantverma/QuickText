@@ -36,8 +36,7 @@ const TextViewer = ({ theme, textShare, onCopy, onBack }) => {
         <div className={`text-xs sm:text-sm ${
           theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
         }`}>
-          <p>Share ID: {textShare.customLink || textShare.shareId}</p>
-          <p>Views: {textShare.viewCount || 0}</p>
+      
           <p>Created: {textShare.createdAt ? new Date(textShare.createdAt).toLocaleString() : '-'}</p>
           {textShare.expiresAt && (
             <p>Expires: {new Date(textShare.expiresAt).toLocaleString()}</p>
@@ -65,5 +64,8 @@ const TextViewer = ({ theme, textShare, onCopy, onBack }) => {
 }
 
 export default TextViewer
+
+
+
 
 

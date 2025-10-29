@@ -1,17 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {  Link } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { signUp } from '../services/api/user';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 const SignupPage = () => {
 
+  const navigate = useNavigate();
+  const {user} = useAuth();
+
   const { theme } = useTheme();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -40,26 +46,31 @@ const SignupPage = () => {
         setLoading(false);
     }
   };
+ 
+  useEffect(()=>{
+    if (user) 
+    return navigate("/");
+  },[user])
 
   return (
     <div className={`min-h-screen py-6 sm:py-8 px-4 ${
       theme === 'dark' 
-        ? 'bg-linear-to-br from-gray-900 to-gray-800' 
-        : 'bg-linear-to-br from-blue-50 to-indigo-100'
+        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
     }`}>
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md md:max-w-lg mx-auto w-full">
 
         {/* Signup Form */}
-        <div className={`rounded-xl shadow-lg p-6 sm:p-8 ${
+        <div className={`rounded-xl shadow-lg p-5 sm:p-6 md:p-8 ${
           theme === 'dark' ? 'bg-gray-800' : 'bg-white'
         }`}>
           <div className="text-center mb-6">
-            <h2 className={`text-xl sm:text-2xl font-bold mb-2 ${
+            <h2 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 ${
               theme === 'dark' ? 'text-white' : 'text-gray-800'
             }`}>
               Create Account
             </h2>
-            <p className={`text-sm ${
+            <p className={`text-xs sm:text-sm ${
               theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
             }`}>
               Join {import.meta.env.VITE_APP_NAME || 'Quick'}Text today
@@ -85,7 +96,7 @@ const SignupPage = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
+                className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
                   theme === 'dark'
                     ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                     : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
@@ -106,7 +117,7 @@ const SignupPage = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
+                className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
                   theme === 'dark'
                     ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                     : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
@@ -127,7 +138,7 @@ const SignupPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
+                className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
                   theme === 'dark'
                     ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                     : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
@@ -139,7 +150,7 @@ const SignupPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-indigo-600 text-white py-2.5 sm:py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>

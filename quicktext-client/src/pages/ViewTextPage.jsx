@@ -24,7 +24,6 @@ const ViewTextPage = () => {
         const data = response.data?.data || response.data;
         setTextShare(data);
       } catch (err) {
-        console.log(err);
         setError(err.response?.data?.error?.message || err.response?.data?.message || 'Text share not found or expired');
       } finally {
         setLoading(false);

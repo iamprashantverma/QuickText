@@ -1,8 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/quicktextdb
-      database: QuickText
+      uri: "mongodb+srv://vermapv749_db_user:h9rR4t5463yG7rxW@quicktext-cluster.8rm5ekc.mongodb.net/?appName=quicktext-cluster"
+      database: "quicktextdb"
 
 logging:
   level:

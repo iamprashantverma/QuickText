@@ -1,21 +1,21 @@
 spring:
   data:
     mongodb:
-      uri: "mongodb+srv://vermapv749_db_user:h9rR4t5463yG7rxW@quicktext-cluster.8rm5ekc.mongodb.net/?appName=quicktext-cluster"
-      database: "quicktextdb"
+      uri: ${DB_URL}
+      database: quicktextdb
 
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
 jwt:
-  secretKey: "ads9f6ask3h4k1hf86asdfiahkjh34a789s6df89ayshkjh3jkh786ads78ay"
+  secretKey: ${SECRET_KEY}
 
-profileUrl: "https://res.cloudinary.com/dacxt4qjt/image/upload/profile_kk4erj.png"
+profileUrl: ${PROFILE_URL}
 
 cloudinary:
-  cloud-name: "dacxt4qjt"
-  api-key: "522395392912923"
-  api-secret: "0sRJKH16mAbdGnjyb8CuFVuuqNg"
+  cloud-name: ${CLOUD_NAME}
+  api-key: ${API_KEY}
+  api-secret: ${API_SECRET}
 
-frontend-url: "http://localhost:5173"
+frontend-url: ${FRONTEND_URL}

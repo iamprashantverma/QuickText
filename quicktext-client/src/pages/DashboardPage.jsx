@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 import{ toast} from 'react-hot-toast';
+import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 import { useNavigate } from 'react-router-dom';
 import { deleteText } from '../services/api/textService';
 import { getAllTexts } from '../services/api/textService';
 
 
 const DashboardPage = () => {
+
   const { user} = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ const DashboardPage = () => {
       const items = resp?.data?.data || resp?.data || [];
       setTextShares(Array.isArray(items) ? items : (items.texts || []));
     } catch (err) {
-      let message = 'Failed to load your texts.';
+      let message = err?.message || 'Failed to load your texts.';
       if (err.response) {
         message = err?.response?.data?.error?.message || message;
       } else if (err.message) {
@@ -66,28 +68,10 @@ const DashboardPage = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className={`min-h-screen py-6 sm:py-8 px-4 ${
-        theme === 'dark' 
-          ? 'bg-linear-to-br from-gray-900 to-gray-800' 
-          : 'bg-linear-to-br from-blue-50 to-indigo-100'
-      }`}>
-        <div className="max-w-6xl mx-auto">
-          <div className={`rounded-xl shadow-lg p-6 sm:p-8 ${
-            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <div className="text-center">
-              <p className={`text-lg ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-              }`}>Loading your text shares...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+    if (loading) {
+      return <LoadingSkeleton theme={theme} />;
+    }
+    
   return (
     <div className={`min-h-screen py-6 sm:py-8 px-4 ${
       theme === 'dark' 

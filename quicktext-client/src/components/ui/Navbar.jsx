@@ -23,8 +23,8 @@ const Navbar = () => {
           
           const {data} = await uploadProfileImage(file);
             updateUser(data.data);
+           toast.success("Profile picture updated successfully ");
         } catch (err) {
-
           if (err?.response.data?.error?.message)
             toast.error(err?.response.data?.error?.message);
 

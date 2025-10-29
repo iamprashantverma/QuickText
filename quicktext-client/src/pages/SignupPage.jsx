@@ -4,6 +4,7 @@ import { useTheme } from '../hooks/useTheme';
 import { signUp } from '../services/api/user';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import {toast} from 'react-hot-toast';
 const SignupPage = () => {
 
   const navigate = useNavigate();
@@ -32,8 +33,11 @@ const SignupPage = () => {
     setLoading(true);
 
     try {
-        const resp = await signUp(formData);
-        console.log(resp);
+        await signUp(formData);
+        toast.success("Signup successful! You can now log in.");
+        navigate("/login")
+        setFormData({ name: '',email: '', password: ''});
+
     } catch (err) {
       console.log(err);
         let message = "Something went wrong. Please try again.";
@@ -55,8 +59,8 @@ const SignupPage = () => {
   return (
     <div className={`min-h-screen py-6 sm:py-8 px-4 ${
       theme === 'dark' 
-        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+        ? 'bg-linear-to-br from-gray-900 to-gray-800' 
+        : 'bg-linear-to-br from-blue-50 to-indigo-100'
     }`}>
       <div className="max-w-md md:max-w-lg mx-auto w-full">
 

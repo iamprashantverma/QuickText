@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { getTextByLink } from '../services/api/textService';
 import TextViewer from '../components/ui/TextViewer';
+import SingleTaskSkeleton from '../components/ui/SingleTaskSkeleton';
 
 const ViewTextPage = () => {
   const { shareId } = useParams();
@@ -14,7 +15,7 @@ const ViewTextPage = () => {
   const hasFetched = useRef(false);
 
   useEffect(() => {
-    // Prevent double fetch in Strict Mode
+
     if (hasFetched.current) return;
     hasFetched.current = true;
     
@@ -24,7 +25,13 @@ const ViewTextPage = () => {
         const data = response.data?.data || response.data;
         setTextShare(data);
       } catch (err) {
-        setError(err.response?.data?.error?.message || err.response?.data?.message || 'Text share not found or expired');
+        let message = err?.message || 'Failed to load your texts.';
+        if (err.response) {
+          message = err?.response?.data?.error?.message || message;
+        } else if (err.message) {
+          message = err.message;
+        }
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -33,29 +40,9 @@ const ViewTextPage = () => {
     fetchTextShare();
   }, [shareId]);
 
-  
 
- 
   if (loading) {
-    return (
-      <div className={`min-h-screen py-6 sm:py-8 px-4 ${
-        theme === 'dark' 
-          ? 'bg-linear-to-br from-gray-900 to-gray-800' 
-          : 'bg-linear-to-br from-blue-50 to-indigo-100'
-      }`}>
-        <div className="max-w-4xl mx-auto">
-          <div className={`rounded-xl shadow-lg p-6 sm:p-8 ${
-            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <div className="text-center">
-              <p className={`text-lg ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-              }`}>Loading text share...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <SingleTaskSkeleton theme={theme}/>
   }
 
   if (error) {

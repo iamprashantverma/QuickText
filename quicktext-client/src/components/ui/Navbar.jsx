@@ -100,7 +100,7 @@ const Navbar = () => {
                   Dashboard
                 </button>
                 <button
-                  onClick={() => { logout(); navigate('/') }}
+                  onClick={() => { logout();  toast.success("Logout successfully"); navigate('/') }}
                   className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-colors ${
                     theme === 'dark' ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                   }`}

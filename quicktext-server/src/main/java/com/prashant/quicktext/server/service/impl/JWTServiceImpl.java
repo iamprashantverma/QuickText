@@ -30,7 +30,6 @@ public class JWTServiceImpl implements JWTService {
                 .subject(user.getEmail())
                 .claim("email",user.getEmail())
                 .claim("name",user.getName())
-                .claim("profileUrl",user.getProfileImageUrl())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000*60*60*15))
                 .signWith(getSecretKey())

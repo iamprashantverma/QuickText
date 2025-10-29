@@ -7,15 +7,18 @@ import com.prashant.quicktext.server.exception.UserAlreadyExistsException;
 import com.prashant.quicktext.server.exception.UserNotFoundException;
 import com.prashant.quicktext.server.repository.UserRepository;
 
+import com.prashant.quicktext.server.service.CloudinaryService;
 import com.prashant.quicktext.server.service.UserService;
+import com.prashant.quicktext.server.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
@@ -26,6 +29,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     public final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuthUtil authUtil;
+    private final CloudinaryService cloudinaryService;
 
     @Value("${profileUrl}")
     private String profileUrl;
@@ -56,6 +61,24 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(userEmail).orElseThrow(
                 ()-> new UserNotFoundException("user not found with email:"+userEmail)
         );
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public UserResponseDTO updateProfilePicture(MultipartFile profileImage) {
+
+        User user = authUtil.getCurrentUser();
+        String profileUrl = cloudinaryService.uploadImage(profileImage);
+        user.setProfileImageUrl(profileUrl);
+        User savedUser = userRepository.save(user);
+        return convertToUserResponseDTO(savedUser);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public UserResponseDTO getUser() {
+        User user  = authUtil.getCurrentUser();
+        return convertToUserResponseDTO(user);
     }
 
     private User convertToUserEntity(UserRequestDTO requestDTO) {

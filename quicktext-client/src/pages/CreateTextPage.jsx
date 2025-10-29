@@ -61,9 +61,6 @@ const CreateTextPage = () => {
         oneTimeView,
         link: customLink.trim() || null,
       };
-
-      console.log("Generated Payload:", payload);
-
       const response = await createText(payload);
 
       const generatedl = response.data.data.link;
@@ -180,153 +177,156 @@ const CreateTextPage = () => {
         <div className={`rounded-xl shadow-lg p-3 sm:p-4 mb-4 ${
           theme === 'dark' ? 'bg-gray-800' : 'bg-white'
         }`}>
-          <div className="space-y-3 text-xs sm:text-sm mb-4">
-            {/* One Time View First */}
-            <div className={`flex items-center gap-2 pb-3 border-b ${
-              theme === 'dark' ? 'border-gray-600' : 'border-gray-200'
-            }`}>
-              <input
-                type="checkbox"
-                id="oneTime"
-                checked={oneTimeView}
-                onChange={(e) => setOneTimeView(e.target.checked)}
-                className="w-4 h-4 text-indigo-600 rounded"
-              />
-              <label htmlFor="oneTime" className={`cursor-pointer ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                One-time view
-              </label>
+          {/* Controls in one row on larger screens */}
+          <div className="flex flex-col md:flex-row md:flex-nowrap items-start md:items-end gap-3 sm:gap-4 mb-4">
+            {/* One Time View */}
+            <div className="md:w-1/4">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="oneTime"
+                  checked={oneTimeView}
+                  onChange={(e) => setOneTimeView(e.target.checked)}
+                  className="w-4 h-4 text-indigo-600 rounded"
+                />
+                <label htmlFor="oneTime" className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-sm`}>
+                  One-time view
+                </label>
+              </div>
             </div>
 
-            {/* Expiration Dropdown - Disabled if one-time is selected */}
-            {!oneTimeView && (
-              <div className="space-y-1.5">
-                <label htmlFor="expiration" className={`block text-xs font-medium ${
-                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                }`}>Expiration Time</label>
-                <div ref={dropdownRef} className="relative flex items-center gap-2 flex-wrap">
+            {/* Expiration */}
+            <div className="md:w-1/4">
+              <label htmlFor="expiration" className={`block text-xs font-medium mb-1 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Expiration</label>
+              <div ref={dropdownRef} className="relative flex items-center gap-2 flex-nowrap">
+                {(!oneTimeView && isCustomExpiration) ? (
+                  <div className="flex items-center gap-2 w-full">
+                    <input
+                      type="number"
+                      min="5"
+                      step="1"
+                      max="21600"
+                      value={customExpirationMinutes}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // allow empty or up to 5 digits numeric during typing; validate bounds on blur/generate
+                        if (value === '' || /^\d+$/.test(value)) {
+                          setCustomExpirationMinutes(value);
+                        }
+                      }}
+                      onBlur={() => {
+                        if (customExpirationMinutes === '') return;
+                        let n = parseInt(customExpirationMinutes);
+                        if (isNaN(n)) return;
+                        if (n < 5) n = 5;
+                        if (n > 21600) n = 21600;
+                        setCustomExpirationMinutes(String(n));
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
+                          e.preventDefault();
+                        }
+                      }}
+                      placeholder="Min 5"
+                      className={`w-20 sm:w-24 md:w-28 px-2 sm:px-3 py-1.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-medium transition-all text-xs sm:text-sm ${
+                        theme === 'dark'
+                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400 hover:border-gray-500'
+                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500 hover:border-gray-400'
+                      }`}
+                    />
+                    <span className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-xs sm:text-sm whitespace-nowrap`}>min</span>
+                    <button
+                      type="button"
+                      onClick={() => { setIsCustomExpiration(false); setIsDropdownOpen(false); }}
+                      className={`px-3 py-2 rounded text-sm ${theme === 'dark' ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+                    >
+                      Options
+                    </button>
+                  </div>
+                ) : (
                   <button
                     type="button"
                     id="expiration"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    onClick={() => !isExpirationDisabled && setIsDropdownOpen(!isDropdownOpen)}
                     disabled={isExpirationDisabled}
-                    className={`flex-1 sm:flex-none sm:w-40 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-medium transition-all cursor-pointer flex items-center justify-between ${
+                    className={`w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-medium transition-all cursor-pointer flex items-center justify-between ${
                       theme === 'dark'
                         ? 'border-gray-600 bg-gray-700 text-white hover:border-gray-500'
                         : 'border-gray-300 bg-white text-gray-900 hover:border-gray-400'
-                    }`}
+                    } ${isExpirationDisabled ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <span>
-                      {isCustomExpiration ? 'Custom duration' : 
+                      {oneTimeView ? 'Disabled for one-time' : isCustomExpiration ? 'Custom duration' : 
                        expiration === 'never' ? 'Never expires' :
                        expiration + ' minutes'}
                     </span>
                     <span>▼</span>
                   </button>
-                  
-                  {isDropdownOpen && (
-                    <div className="absolute top-full left-0 z-50 mt-1 w-full sm:w-40 border rounded-lg shadow-lg overflow-hidden">
-                      <div className={`max-h-48 overflow-y-auto ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>
-                        {['never', '5', '30', 'custom'].map((opt) => (
-                          <button
-                            key={opt}
-                            type="button"
-                            onClick={() => {
-                              if (opt === 'custom') {
-                                setIsCustomExpiration(true);
-                              } else {
-                                setIsCustomExpiration(false);
-                                setExpiration(opt);
-                              }
-                              setIsDropdownOpen(false);
-                            }}
-                            className={`w-full px-3 sm:px-4 py-2 text-xs sm:text-sm text-left hover:bg-indigo-100 ${
-                              theme === 'dark' ? 'text-white hover:bg-gray-600' : 'text-gray-900'
-                            } ${(opt === expiration && !isCustomExpiration) || (opt === 'custom' && isCustomExpiration) ? 'bg-indigo-600 text-white' : ''}`}
-                          >
-                            {opt === 'never' ? 'Never expires' :
-                             opt === 'custom' ? 'Custom duration' :
-                             opt + ' minutes'}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {isCustomExpiration && (
-                    <div className="flex items-center gap-2 flex-1 sm:flex-none">
-                      <input
-                          type="number"
-                          min="5"
-                          step="1"
-                          max="21600"
-                          value={customExpirationMinutes}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (
-                              value === '' ||
-                              (!isNaN(value) && parseInt(value) > 4 && parseInt(value) <= 21600)
-                            ) {
-                              setCustomExpirationMinutes(value);
+                )}
+                {isDropdownOpen && !isExpirationDisabled && !isCustomExpiration && (
+                  <div className="absolute top-full left-0 z-50 mt-1 w-full border rounded-lg shadow-lg overflow-hidden">
+                    <div className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>
+                      {['never', '5', '30', 'custom'].map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => {
+                            if (opt === 'custom') {
+                              setIsCustomExpiration(true);
+                            } else {
+                              setIsCustomExpiration(false);
+                              setExpiration(opt);
                             }
+                            setIsDropdownOpen(false);
                           }}
-                          onKeyDown={(e) => {
-                            if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
-                              e.preventDefault();
-                            }
-                          }}
-                          placeholder="Min 5"
-                          className={`
-                            w-full sm:w-28 px-2.5 sm:px-3 py-1.5 sm:py-2
-                            border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-medium transition-all
-                            text-[clamp(0.8rem,2vw,0.95rem)]
-                            placeholder:text-gray-400
-                            placeholder:text-[0.7rem] sm:placeholder:text-sm md:placeholder:text-[0.85rem] lg:placeholder:text-sm
-                            ${
-                              theme === 'dark'
-                                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400 hover:border-gray-500'
-                                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500 hover:border-gray-400'
-                            }
-                          `}
-                        />
-
-                      <span className={`text-sm font-medium whitespace-nowrap ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                      }`}>min</span>
+                          className={`w-full px-3 sm:px-4 py-2 text-sm md:text-base text-left hover:bg-indigo-100 ${
+                            theme === 'dark' ? 'text-white hover:bg-gray-600' : 'text-gray-900'
+                          } ${(opt === expiration && !isCustomExpiration) || (opt === 'custom' && isCustomExpiration) ? 'bg-indigo-600 text-white' : ''}`}
+                        >
+                          {opt === 'never' ? 'Never expires' :
+                           opt === 'custom' ? 'Custom duration' :
+                           opt + ' minutes'}
+                        </button>
+                      ))}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Generate Link + Custom Link in Same Row */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <input
-              type="text"
-              value={customLink}
-              onChange={(e) => setCustomLink(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
-              placeholder="quicktext/prashnat-note"
-              className={`flex-1 px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 outline-none text-xs sm:text-sm
-                ${theme === 'dark'
-                  ? 'bg-gray-700 placeholder-gray-400'
-                  : 'bg-white placeholder-gray-500'}
-                ${
+            {/* Custom Link */}
+            <div className="md:flex-1">
+              <label className={`block text-xs font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Custom link (optional)
+              </label>
+              <input
+                type="text"
+                value={customLink}
+                onChange={(e) => setCustomLink(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
+                placeholder="quicktext/prashnat-note"
+                className={`w-full px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 outline-none text-xs sm:text-sm ${
+                  theme === 'dark' ? 'bg-gray-700 placeholder-gray-400' : 'bg-white placeholder-gray-500'
+                } ${
                   isAvailable === null
                     ? `${theme === 'dark' ? 'text-white border-gray-600 focus:ring-indigo-500' : 'text-gray-900 border-gray-300 focus:ring-indigo-500'}`
                     : isAvailable
                     ? 'border-green-500 text-green-600 focus:ring-green-500'
                     : 'border-red-500 text-red-600 focus:ring-red-500'
-                }
-              `}
-            />
-            <button
-              onClick={generateLink}
-              disabled={loading || !content.trim() || (isAvailable != null && !isAvailable)}
-              className="px-4 sm:px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap text-xs sm:text-sm"
-            >
-              {loading ? 'Generating...' : 'Generate Link'}
-            </button>
+                }`}
+              />
+            </div>
+            {/* Generate Button (right on md+) */}
+            <div className="md:ml-4 md:self-end w-full md:w-auto">
+              <button
+                onClick={generateLink}
+                disabled={loading || !content.trim() || (isAvailable != null && !isAvailable)}
+                className="w-full md:w-auto px-4 sm:px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap text-xs sm:text-sm"
+              >
+                {loading ? 'Generating...' : 'Generate Link'}
+              </button>
+            </div>
           </div>
         </div>
         )}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import {  Link } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
+import {toast }from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const LoginPage = () => {
 
     try {
       await login(formData);
+      toast.success("Login Successfully")
       setFormData({email:'',password:''});
     } catch (err) {
       let message = "Something went wrong. Please try again.";
@@ -55,8 +57,8 @@ const LoginPage = () => {
     <div
       className={`min-h-screen py-6 sm:py-8 px-4 ${
         theme === 'dark'
-          ? 'bg-gradient-to-br from-gray-900 to-gray-800'
-          : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+          ? 'bg-linear-to-br from-gray-900 to-gray-800'
+          : 'bg-linear-to-br from-blue-50 to-indigo-100'
       }`}
     >
       <div className="max-w-md md:max-w-lg mx-auto w-full">

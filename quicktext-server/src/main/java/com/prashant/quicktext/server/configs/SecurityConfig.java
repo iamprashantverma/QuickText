@@ -2,6 +2,7 @@ package com.prashant.quicktext.server.configs;
 
 import com.prashant.quicktext.server.filter.JWTFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,12 +27,15 @@ public class SecurityConfig {
 
     private final JWTFilter jwtFilter;
 
+    @Value("${frontend-url}")
+    private String frontendUrl;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws  Exception {
         return http
                 .cors(cors -> cors.configurationSource(request -> {
                     var config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:5173"));
+                    config.setAllowedOrigins(List.of(frontendUrl));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "multipart/form-data"));
                     config.setAllowCredentials(true);

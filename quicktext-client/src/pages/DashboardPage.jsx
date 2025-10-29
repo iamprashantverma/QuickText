@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
-
+import{ toast} from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { deleteText } from '../services/api/textService';
 import { getAllTexts } from '../services/api/textService';
@@ -15,7 +15,7 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [confirmForId, setConfirmForId] = useState(null);
-  const [toastMessage, setToastMessage] = useState('');
+
 
 
   useEffect(() => {
@@ -25,6 +25,7 @@ const DashboardPage = () => {
     }
     fetchTextShares();
   }, [user,navigate]);
+
 
   const fetchTextShares = async () => {
     setError('');
@@ -36,7 +37,7 @@ const DashboardPage = () => {
     } catch (err) {
       let message = 'Failed to load your texts.';
       if (err.response) {
-        message = err.response.data?.message || message;
+        message = err?.response?.data?.error?.message || message;
       } else if (err.message) {
         message = err.message;
       }
@@ -52,8 +53,8 @@ const DashboardPage = () => {
       await deleteText(shareId);
       setTextShares((prev) => prev.filter((s) => (s.id ?? s.shareId) !== shareId));
       setConfirmForId(null);
-      setToastMessage('Deleted successfully');
-      setTimeout(() => setToastMessage(''), 1500);
+      toast.success("Deleted successfully");
+
     } catch (err) {
       let message = 'Failed to delete the item.';
       if (err.response) {
@@ -69,8 +70,8 @@ const DashboardPage = () => {
     return (
       <div className={`min-h-screen py-6 sm:py-8 px-4 ${
         theme === 'dark' 
-          ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-          : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+          ? 'bg-linear-to-br from-gray-900 to-gray-800' 
+          : 'bg-linear-to-br from-blue-50 to-indigo-100'
       }`}>
         <div className="max-w-6xl mx-auto">
           <div className={`rounded-xl shadow-lg p-6 sm:p-8 ${
@@ -90,15 +91,10 @@ const DashboardPage = () => {
   return (
     <div className={`min-h-screen py-6 sm:py-8 px-4 ${
       theme === 'dark' 
-        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
-        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+        ? 'bg-linear-to-br from-gray-900 to-gray-800' 
+        : 'bg-linear-to-br from-blue-50 to-indigo-100'
     }`}>
       <div className="max-w-6xl mx-auto">
-        {toastMessage && (
-          <div className="mb-4 px-4 py-2 rounded-lg bg-green-600 text-white text-sm inline-block">
-            {toastMessage}
-          </div>
-        )}
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 mb-5">
           <div>
@@ -137,8 +133,8 @@ const DashboardPage = () => {
                 No text shares yet. Create your first one!
               </p>
               <button
-                onClick={() => navigate('/create')}
-                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                onClick={() => navigate('/')}
+                className="mt-3 px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
               >
                 Create Text Share
               </button>

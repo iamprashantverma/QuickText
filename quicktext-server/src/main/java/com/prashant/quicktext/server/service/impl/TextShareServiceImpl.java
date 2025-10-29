@@ -9,7 +9,6 @@ import com.prashant.quicktext.server.exception.CustomLinkAlreadyExistsException;
 import com.prashant.quicktext.server.exception.TextNotFoundException;
 import com.prashant.quicktext.server.repository.ArchivedTextRepository;
 import com.prashant.quicktext.server.repository.TextShareRepository;
-import com.prashant.quicktext.server.service.AuthService;
 import com.prashant.quicktext.server.service.TextShareService;
 import com.prashant.quicktext.server.util.AppUtil;
 import com.prashant.quicktext.server.util.AuthUtil;
@@ -22,13 +21,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class TextShareServiceImpl implements TextShareService {
-
+    private static final String[] blockedLinks = {"login","signup","dashboard","create"};
     private final ModelMapper modelMapper;
     private final TextShareRepository textShareRepository;
     private final AuthUtil authUtil;
@@ -70,7 +70,9 @@ public class TextShareServiceImpl implements TextShareService {
         // fetch the current User if logged in
         User currentUser = authUtil.getCurrentUser();
         textShare.setUser(currentUser);
+
         log.info("current User:{}",currentUser);
+
         //  Save entity and return DTO
         TextShare savedTextShare = textShareRepository.save(textShare);
         return convertToTextShareDTO(savedTextShare);
@@ -147,7 +149,9 @@ public class TextShareServiceImpl implements TextShareService {
 
         String link = validateLinkDTO.getCustomLink();
         boolean exists = textShareRepository.existsByLink(link);
-
+        boolean isBlockedLink = Arrays.asList(blockedLinks).contains(link);
+        if (isBlockedLink)
+            exists = true;
         return ValidateLinkDTO.builder()
                 .customLink(link)
                 .isAvailable(!exists)

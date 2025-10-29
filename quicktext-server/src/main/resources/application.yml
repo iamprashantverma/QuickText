@@ -17,3 +17,5 @@ cloudinary:
   cloud-name: "dacxt4qjt"
   api-key: "522395392912923"
   api-secret: "0sRJKH16mAbdGnjyb8CuFVuuqNg"
+
+frontend-url: "http://localhost:5173"

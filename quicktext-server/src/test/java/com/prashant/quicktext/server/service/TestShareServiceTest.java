@@ -14,7 +14,7 @@ public class TestShareServiceTest {
     @Test
     public void createText() {
         TextShareDTO shareDTO = TextShareDTO.builder()
-                .contentHtml("Hello ji, this is the first Text")
+                .content("Hello ji, this is the first Text")
                 .build();
         System.out.println(textShareService.createText(shareDTO));
     }

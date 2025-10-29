@@ -35,10 +35,7 @@ const ViewTextPage = () => {
 
   
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-  };
-
+ 
   if (loading) {
     return (
       <div className={`min-h-screen py-6 sm:py-8 px-4 ${
@@ -73,11 +70,6 @@ const ViewTextPage = () => {
             theme === 'dark' ? 'bg-gray-800' : 'bg-white'
           }`}>
             <div className="text-center">
-              <h1 className={`text-2xl font-bold mb-4 ${
-                theme === 'dark' ? 'text-white' : 'text-gray-800'
-              }`}>
-                Text Share Not Found
-              </h1>
               <p className={`text-lg mb-6 ${
                 theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
               }`}>
@@ -85,7 +77,7 @@ const ViewTextPage = () => {
               </p>
               <button
                 onClick={() => navigate('/')}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                className="px-2 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
               >
                 Go Home
               </button>
@@ -106,7 +98,6 @@ const ViewTextPage = () => {
         <TextViewer
           theme={theme}
           textShare={textShare}
-          onCopy={copyToClipboard}
           onBack={() => navigate('/')}
         />
       </div>

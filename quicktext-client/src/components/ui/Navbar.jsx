@@ -1,14 +1,40 @@
-import React from 'react'
+import  { useRef, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useTheme } from '../../hooks/useTheme'
 import { useAuth } from '../../hooks/useAuth'
+import { uploadProfileImage } from '../../services/api/user';
+import {toast} from 'react-hot-toast';
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme()
-  const { user, logout } = useAuth()
+  const { user, logout, updateUser } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  console.log(user);
+  const fileInputRef = useRef(null)
+  const [uploading, setUploading] = useState(false)
+
+  const updateProfileImage = async (e) => {
+
+      const file = e.target.files?.[0]
+
+      if (!file) return
+        try {
+          setUploading(true)
+          
+          const {data} = await uploadProfileImage(file);
+            updateUser(data.data);
+        } catch (err) {
+
+          if (err?.response.data?.error?.message)
+            toast.error(err?.response.data?.error?.message);
+
+          console.error('Profile image upload failed', err)
+        } finally {
+          setUploading(false)
+          if (fileInputRef.current) fileInputRef.current.value = ''
+        }
+    }
+
   return (
     <div className={`${
       theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
@@ -35,25 +61,38 @@ const Navbar = () => {
 
             {user ? (
               <>
-                {user?.profileIUrl || user?.profileUrl || user?.picture ? (
-                  <img
-                    src={user.profileUrl || user.profileUrl || user.picture}
-                    alt="Profile"
-                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover border-2 border-white/30"
-                  />
-                ) : (
-                  <span
-                    className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold ${
-                      theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-                    }`}
-                  >
-                    {(user?.name || user?.username || user?.email || 'U')
-                      .toString()
-                      .trim()
-                      .charAt(0)
-                      .toUpperCase()}
-                  </span>
-                )}
+                <button
+                  onClick={() => !uploading && fileInputRef.current?.click()}
+                  title={uploading ? 'Uploading...' : 'Change profile image'}
+                  className="relative"
+                >
+                  {user?.profileImageUrl || user?.profileUrl || user?.picture ? (
+                    <img
+                      src={user.profileImageUrl || user.profileUrl || user.picture}
+                      alt="Profile"
+                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover border-2 border-white/30 ${uploading ? 'opacity-60' : ''}`}
+                    />
+                  ) : (
+                    <span
+                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold ${
+                        theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                      } ${uploading ? 'opacity-60' : ''}`}
+                    >
+                      {(user?.name || user?.username || user?.email || 'U')
+                        .toString()
+                        .trim()
+                        .charAt(0)
+                        .toUpperCase()}
+                    </span>
+                  )}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={updateProfileImage}
+                />
                 <button
                   onClick={() => navigate('/dashboard')}
                   className="px-2.5 sm:px-4 py-1.5 sm:py-2 bg-indigo-600 text-white rounded-lg text-[11px] sm:text-sm font-medium hover:bg-indigo-700 transition-colors"

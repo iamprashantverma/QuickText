@@ -43,12 +43,14 @@ const TextViewer = ({ theme, textShare, onCopy, onBack }) => {
           )}
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={onCopy}
-            className="px-3 sm:px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm"
-          >
-            Copy Link
-          </button>
+          {onCopy && (
+            <button
+              onClick={onCopy}
+              className="px-3 sm:px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm"
+            >
+              Copy Link
+            </button>
+          )}
           <button
             onClick={onBack}
             className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm ${

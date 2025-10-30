@@ -104,8 +104,5 @@ sudo docker run -d \
 **Prashant Verma**  
 Passionate about building fast, practical web applications that solve real-world problems.
 
-##  License
-
-This project is open source and available under the [MIT License](LICENSE).
 
 ⭐ **If you find this project useful, please give it a star on GitHub!**

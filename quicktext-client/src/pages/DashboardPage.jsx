@@ -38,7 +38,7 @@ const DashboardPage = () => {
       setTextShares(Array.isArray(items) ? items : (items.texts || []));
     } catch (err) {
       let message = err?.message || 'Failed to load your texts.';
-      if (err.response) {
+      if (err?.response) {
         message = err?.response?.data?.error?.message || message;
       } else if (err.message) {
         message = err.message;
@@ -60,7 +60,7 @@ const DashboardPage = () => {
     } catch (err) {
       let message = 'Failed to delete the item.';
       if (err.response) {
-        message = err.response.data?.message || message;
+        message = err.response.data?.error?.message || message;
       } else if (err.message) {
         message = err.message;
       }

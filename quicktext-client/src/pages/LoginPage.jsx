@@ -42,7 +42,7 @@ const LoginPage = () => {
       setFormData({email:'',password:''});
     } catch (err) {
       let message = "Something went wrong. Please try again.";
-      if (err.response)
+      if (err?.response)
           message =  err.response.data?.error?.message;
       else if (err.request)
           message = "No response from server. Please check your internet connection or try again later.";

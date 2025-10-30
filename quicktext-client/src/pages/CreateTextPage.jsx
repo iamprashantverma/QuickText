@@ -101,6 +101,7 @@ const CreateTextPage = () => {
     }
     const validate = async () => {
       try {
+        setError('');
         const resp = await validateCustomURL(customLink);
         let flag = resp.data.data.isAvailable;
         setIsAvailable(flag);

@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
     public Boolean canDeleteText(String id) {
         TextShare entity = textShareRepository.findById(id).orElse(null);
         if (entity == null)
-            throw  new TextNotFoundException("Invalid id");
+            throw  new TextNotFoundException("Text content not found for id: " + id);
         User currentUser = authUtil.getCurrentUser();
 
         if (entity.getUser() == null || currentUser == null)

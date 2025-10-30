@@ -1,8 +1,9 @@
 spring:
   data:
     mongodb:
-      uri: ${DB_URL}
+      uri: "mongodb+srv://vermapv749_db_user:${DB_PASSWORD}@quicktext-cluster.8rm5ekc.mongodb.net/?appName=quicktext-cluster"
       database: quicktextdb
+
 
 logging:
   level:
@@ -11,10 +12,10 @@ logging:
 jwt:
   secretKey: ${SECRET_KEY}
 
-profileUrl: ${PROFILE_URL}
+profileUrl: "https://res.cloudinary.com/dacxt4qjt/image/upload/profile_kk4erj.png"
 
 cloudinary:
-  cloud-name: ${CLOUD_NAME}
+  cloud-name: "dacxt4qjt"
   api-key: ${API_KEY}
   api-secret: ${API_SECRET}
 

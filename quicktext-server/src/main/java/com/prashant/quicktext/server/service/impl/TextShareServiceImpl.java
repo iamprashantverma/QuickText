@@ -49,6 +49,13 @@ public class TextShareServiceImpl implements TextShareService {
             );
         }
 
+        boolean isBlockedLink = Arrays.asList(blockedLinks).contains(customLink);
+
+        if (isBlockedLink)
+            throw new CustomLinkAlreadyExistsException(
+                    "The custom link '" + customLink + "' is already registered by another user."
+            );
+
         //  Generate unique random link
         String generatedLink;
         do {
@@ -147,7 +154,7 @@ public class TextShareServiceImpl implements TextShareService {
     @Override
     public ValidateLinkDTO validateCustomLink(ValidateLinkDTO validateLinkDTO) {
 
-        String link = validateLinkDTO.getCustomLink();
+        String link = validateLinkDTO.getCustomLink().toLowerCase();
         boolean exists = textShareRepository.existsByLink(link);
         boolean isBlockedLink = Arrays.asList(blockedLinks).contains(link);
         if (isBlockedLink)

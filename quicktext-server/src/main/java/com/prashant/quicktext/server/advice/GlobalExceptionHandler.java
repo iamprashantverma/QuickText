@@ -4,156 +4,128 @@ import com.cloudinary.api.AuthorizationRequired;
 import com.cloudinary.api.exceptions.ApiException;
 import com.cloudinary.api.exceptions.NotFound;
 import com.mongodb.MongoException;
-import com.mongodb.MongoSocketOpenException;
-import com.mongodb.MongoSocketReadException;
 import com.prashant.jobtracker.advices.APIError;
 import com.prashant.quicktext.server.exception.*;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
-
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
+    // USER EXCEPTIONS
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<APIResponse<?>> handleUserNotFound(UserNotFoundException ex) {
         log.warn("User not found: {}", ex.getMessage());
-        APIError error = new APIError(HttpStatus.NOT_FOUND, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new APIResponse<>(error));
-    }
-
-    @ExceptionHandler({
-            MongoException.class,
-            MongoSocketReadException.class,
-            MongoSocketOpenException.class,
-            DataAccessResourceFailureException.class
-    })
-    public ResponseEntity<APIResponse<?>> handleMongoExceptions(Exception ex) {
-        log.error("MongoDB connection error: {}", ex.getMessage(), ex);
-        APIError error = new APIError(
-                HttpStatus.SERVICE_UNAVAILABLE,
-                "Database connection issue. Please try again later."
-        );
-        return ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(new APIResponse<>(error));
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<APIResponse<?>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
         log.warn("User already exists: {}", ex.getMessage());
-        APIError error = new APIError(HttpStatus.CONFLICT, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new APIResponse<>(error));
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<APIResponse<?>> handleInvalidCredentials(InvalidCredentialsException ex) {
-        log.warn("Invalid credentials attempt: {}", ex.getMessage());
-        APIError error = new APIError(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new APIResponse<>(error));
+        log.warn("Invalid credentials: {}", ex.getMessage());
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
-    @ExceptionHandler(CustomLinkAlreadyExistsException.class)
-    public ResponseEntity<APIResponse<?>> handleCustomLinkAlreadyExists(CustomLinkAlreadyExistsException ex) {
-        log.warn("Custom link already exists: {}", ex.getMessage());
-        APIError error = APIError.builder()
-                .status(HttpStatus.CONFLICT)
-                .message(ex.getMessage())
-                .build();
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new APIResponse<>(error));
+    // MONGO / DATABASE EXCEPTIONS
+    @ExceptionHandler({
+            MongoException.class,
+            DataAccessResourceFailureException.class
+    })
+    public ResponseEntity<APIResponse<?>> handleMongoExceptions(Exception ex) {
+        log.error("MongoDB connection error: {}", ex.getMessage(), ex);
+        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE,
+                "Database connection issue. Please try again later.");
     }
 
-    @ExceptionHandler(TextNotFoundException.class)
-    public ResponseEntity<APIResponse<?>> handleTextNotFoundException(TextNotFoundException ex) {
-        log.warn(" link is broken : {}", ex.getMessage());
-        APIError error = APIError.builder()
-                .status(HttpStatus.NOT_FOUND)
-                .message(ex.getMessage())
-                .build();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new APIResponse<>(error));
+    // EXT / LINK EXCEPTIONS
+    @ExceptionHandler({ CustomLinkAlreadyExistsException.class, TextNotFoundException.class })
+    public ResponseEntity<APIResponse<?>> handleTextExceptions(RuntimeException ex) {
+        HttpStatus status = ex instanceof TextNotFoundException ? HttpStatus.NOT_FOUND : HttpStatus.CONFLICT;
+        log.warn("Text/link issue: {}", ex.getMessage());
+        return buildResponse(status, ex.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<APIResponse<?>> handleGenericException(Exception ex) {
-        log.error("Unhandled exception occurred: {} - StackTrace: ", ex.getMessage(), ex);
-        APIError error = new APIError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Something went wrong: " + ex.getMessage()
-        );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new APIResponse<>(error));
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<APIResponse<?>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        StringBuilder messageBuilder = new StringBuilder("Validation failed: ");
-
-        ex.getBindingResult().getFieldErrors().forEach(fieldError ->
-                messageBuilder.append(String.format("[%s: %s] ", fieldError.getField(), fieldError.getDefaultMessage()))
-        );
-
-        String errorMessage = messageBuilder.toString().trim();
-
-        log.warn("Validation failed: {}", errorMessage);
-
-        APIError error = new APIError(HttpStatus.BAD_REQUEST, errorMessage);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new APIResponse<>(error));
+    // SECURITY / AUTHORIZATION
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<APIResponse<?>> handleAuthenticationException(AuthenticationException ex) {
+        log.warn("Authentication failed: {}", ex.getMessage());
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid or missing credentials.");
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<APIResponse<?>> handleAuthorizationDenied(AuthorizationDeniedException ex) {
-        log.warn("Authorization failed: {}", ex.getMessage());
-        APIError error = new APIError(HttpStatus.FORBIDDEN, "Access denied: You do not have permission to perform this action.");
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new APIResponse<>(error));
+        log.warn("Access denied: {}", ex.getMessage());
+        return buildResponse(HttpStatus.FORBIDDEN, "You do not have permission to perform this action.");
     }
 
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<APIResponse<?>> handleJWTException(JwtException ex) {
+        log.warn("JWT error: {}", ex.getMessage());
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid or expired JWT token.");
+    }
+
+    // CLOUDINARY
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<APIResponse<?>> handleCloudinaryApiException(ApiException ex) {
         log.error("Cloudinary API error: {}", ex.getMessage(), ex);
-        APIError error = new APIError(HttpStatus.BAD_GATEWAY, "Cloudinary service error: " + ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(new APIResponse<>(error));
+        return buildResponse(HttpStatus.BAD_GATEWAY, "Cloudinary service error: " + ex.getMessage());
     }
 
     @ExceptionHandler(NotFound.class)
     public ResponseEntity<APIResponse<?>> handleCloudinaryNotFound(NotFound ex) {
         log.warn("Cloudinary resource not found: {}", ex.getMessage());
-        APIError error = new APIError(HttpStatus.NOT_FOUND, "Cloudinary resource not found");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new APIResponse<>(error));
+        return buildResponse(HttpStatus.NOT_FOUND, "Cloudinary resource not found.");
     }
 
     @ExceptionHandler(AuthorizationRequired.class)
     public ResponseEntity<APIResponse<?>> handleCloudinaryAuthError(AuthorizationRequired ex) {
-        log.error("Cloudinary authorization error: {}", ex.getMessage(), ex);
-        APIError error = new APIError(HttpStatus.UNAUTHORIZED, "Invalid Cloudinary credentials or unauthorized access");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new APIResponse<>(error));
+        log.error("Cloudinary authorization error: {}", ex.getMessage());
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid Cloudinary credentials or unauthorized access.");
     }
 
-    @ExceptionHandler({ IOException.class, SocketTimeoutException.class })
-    public ResponseEntity<APIResponse<?>> handleCloudinaryNetworkIssues(Exception ex) {
-        log.error("Cloudinary network issue: {}", ex.getMessage(), ex);
-        APIError error = new APIError(HttpStatus.GATEWAY_TIMEOUT, "Cloudinary network timeout or connectivity issue");
-        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT)
-                .body(new APIResponse<>(error));
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<APIResponse<?>> handleCloudinaryNetworkIssues(IOException ex) {
+        log.error("Cloudinary network issue: {}", ex.getMessage());
+        return buildResponse(HttpStatus.GATEWAY_TIMEOUT, "Cloudinary network timeout or connectivity issue.");
     }
 
+    //VALIDATION
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<APIResponse<?>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(err -> String.format("[%s: %s]", err.getField(), err.getDefaultMessage()))
+                .reduce((a, b) -> a + " " + b)
+                .orElse("Validation failed.");
+        log.warn("Validation failed: {}", message);
+        return buildResponse(HttpStatus.BAD_REQUEST, message);
+    }
+
+    // GENERIC FALLBACK
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<APIResponse<?>> handleGenericException(Exception ex) {
+        log.error("Unhandled exception: {}", ex.getMessage(), ex);
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong: " + ex.getMessage());
+    }
+
+    // Helper method
+    private ResponseEntity<APIResponse<?>> buildResponse(HttpStatus status, String message) {
+        APIError error = new APIError(status, message);
+        return ResponseEntity.status(status).body(new APIResponse<>(error));
+    }
 }

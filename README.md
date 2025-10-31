@@ -20,7 +20,7 @@ QuickText allows you to:
 
 
 ##  Live Demo
-- **Web App:** http://qucktext-client.s3-website.ap-south-1.amazonaws.com
+- **Web App:** https://quicktext-ten.vercel.app/
 - **API Server:** Hosted on AWS EC2
 
 ## 🛠 Technology Stack
@@ -30,7 +30,7 @@ QuickText allows you to:
 | Frontend | React (Vite) + Tailwind CSS |
 | Backend | Spring Boot (JWT Authentication) |
 | Database | MongoDB |
-| Hosting | AWS EC2 (Backend) + AWS S3 (Frontend) |
+| Hosting | AWS EC2 (Backend) + Vercel(Frontend) |
 
 ## 💡 Key Features
 
@@ -95,7 +95,7 @@ sudo docker run -d \
   -e SECRET_KEY="your_secret_key" \
   -e API_KEY="your_cloudinary_api_key" \
   -e API_SECRET="your_cloudinary_api_secret" \
-  -e FRONTEND_URL="http://qucktext-client.s3-website.ap-south-1.amazonaws.com" \
+  -e FRONTEND_URL="https://quicktext-ten.vercel.app" \
   imprashantverma/quicktext-server:latest
 ```
 

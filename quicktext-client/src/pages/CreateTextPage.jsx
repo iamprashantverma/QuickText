@@ -340,6 +340,7 @@ const CreateTextPage = () => {
                     setCustomLink(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))
                   }
                   placeholder="quicktext/prashant-note"
+                  maxLength={50}
                   className={`w-full px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 text-xs sm:text-sm ${
                     theme === 'dark'
                       ? 'bg-gray-700 placeholder-gray-400'

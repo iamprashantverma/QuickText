@@ -81,13 +81,12 @@ const ViewTextPage = () => {
         ? 'bg-linear-to-br from-gray-900 to-gray-800' 
         : 'bg-linear-to-br from-blue-50 to-indigo-100'
     }`}>
-      <div className="max-w-4xl mx-auto">
         <TextViewer
           theme={theme}
           textShare={textShare}
           onBack={() => navigate('/')}
+          showCopyButton={!textShare?.oneTimeView} 
         />
-      </div>
     </div>
   );
 };

@@ -1,31 +1,49 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const TextViewer = ({ theme, textShare, onCopy, onBack }) => {
+const TextViewer = ({ theme, textShare, onBack }) => {
+  const [showPopup, setShowPopup] = useState(false)
   if (!textShare) return null
 
+  const handleCopy = () => {
+    const url = window.location.href
+    navigator.clipboard.writeText(url)
+    setShowPopup(true)
+    setTimeout(() => setShowPopup(false), 1200) 
+  }
+
   return (
-    <div className={`rounded-xl shadow-lg p-4 sm:p-6 ${
-      theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-    }`}>
+    <div
+      className={`rounded-xl shadow-lg p-4 sm:p-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}
+    >
       {textShare.oneTimeView && (
-        <div className={`mb-4 p-3 rounded-lg text-xs sm:text-sm ${
-          theme === 'dark' ? 'bg-yellow-900 text-yellow-100' : 'bg-yellow-50 text-yellow-700'
-        }`}>
+        <div
+          className={`mb-4 p-3 rounded-lg text-xs sm:text-sm ${
+            theme === 'dark'
+              ? 'bg-yellow-900 text-yellow-100'
+              : 'bg-yellow-50 text-yellow-700'
+          }`}
+        >
           This is a one-time view share. Navigating away may make it unavailable.
         </div>
       )}
 
       <div className="mb-4">
-        <h2 className={`text-base sm:text-lg font-semibold mb-2 ${
-          theme === 'dark' ? 'text-white' : 'text-gray-800'
-        }`}>
+        <h2
+          className={`text-base sm:text-lg font-semibold mb-2 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}
+        >
           Shared Text
         </h2>
-        <div className={`p-3 sm:p-4 rounded-lg border ${
-          theme === 'dark' 
-            ? 'bg-gray-700 border-gray-600 text-white' 
-            : 'bg-gray-50 border-gray-200 text-gray-900'
-        }`}>
+        <div
+          className={`p-3 sm:p-4 rounded-lg border ${
+            theme === 'dark'
+              ? 'bg-gray-700 border-gray-600 text-white'
+              : 'bg-gray-50 border-gray-200 text-gray-900'
+          }`}
+        >
           <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
             {textShare.content}
           </pre>
@@ -33,20 +51,28 @@ const TextViewer = ({ theme, textShare, onCopy, onBack }) => {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between mb-4">
-        <div className={`text-xs sm:text-sm ${
-          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-        }`}>
-      
-          <p>Created: {textShare.createdAt ? new Date(textShare.createdAt).toLocaleString() : '-'}</p>
+        <div
+          className={`text-xs sm:text-sm ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}
+        >
+          <p>
+            Created:{' '}
+            {textShare.createdAt
+              ? new Date(textShare.createdAt).toLocaleString()
+              : '-'}
+          </p>
           {textShare.expiresAt && (
             <p>Expires: {new Date(textShare.expiresAt).toLocaleString()}</p>
           )}
         </div>
-        <div className="flex gap-2">
-          {onCopy && (
+
+        <div className="flex gap-2 sm:justify-end">
+          {/* Show Copy button only if NOT one-time view */}
+          {!textShare.oneTimeView && (
             <button
-              onClick={onCopy}
-              className="px-3 sm:px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm"
+              onClick={handleCopy}
+               className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm"
             >
               Copy Link
             </button>
@@ -54,20 +80,24 @@ const TextViewer = ({ theme, textShare, onCopy, onBack }) => {
           <button
             onClick={onBack}
             className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm ${
-              theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+              theme === 'dark'
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
             }`}
           >
             Back
           </button>
         </div>
       </div>
+
+      {/* Custom popup for copy confirmation */}
+      {showPopup && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-md text-sm animate-fade-in">
+          Link copied!
+        </div>
+      )}
     </div>
   )
 }
 
 export default TextViewer
-
-
-
-
-

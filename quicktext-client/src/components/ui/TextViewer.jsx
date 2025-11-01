@@ -5,8 +5,7 @@ const TextViewer = ({ theme, textShare, onBack }) => {
   if (!textShare) return null
 
   const handleCopy = () => {
-    const url = window.location.href
-    navigator.clipboard.writeText(url)
+    navigator.clipboard.writeText(textShare.content);
     setShowPopup(true)
     setTimeout(() => setShowPopup(false), 1200) 
   }
@@ -74,7 +73,7 @@ const TextViewer = ({ theme, textShare, onBack }) => {
               onClick={handleCopy}
                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm"
             >
-              Copy Link
+              Copy 
             </button>
           )}
           <button
@@ -93,7 +92,7 @@ const TextViewer = ({ theme, textShare, onBack }) => {
       {/* Custom popup for copy confirmation */}
       {showPopup && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-md text-sm animate-fade-in">
-          Link copied!
+          Text Copied
         </div>
       )}
     </div>

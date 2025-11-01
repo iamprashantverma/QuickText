@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: "mongodb+srv://vermapv749_db_user:${DB_PASSWORD}@quicktext-cluster.8rm5ekc.mongodb.net/?appName=quicktext-cluster"
+      uri: "mongodb://localhost:27017/quicktext"
       database: quicktextdb
 
 

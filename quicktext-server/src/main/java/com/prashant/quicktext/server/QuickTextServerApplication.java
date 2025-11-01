@@ -13,6 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class QuickTextServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(QuickTextServerApplication.class, args);
-		log.info(" QuickText Application Is Running");
+		log.info(" QuickText Server Is Running");
 	}
 }

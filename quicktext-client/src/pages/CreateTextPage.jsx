@@ -337,7 +337,7 @@ const CreateTextPage = () => {
                   type="text"
                   value={customLink}
                   onChange={(e) =>
-                    setCustomLink(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))
+                    setCustomLink(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''))
                   }
                   placeholder="quicktext/prashant-note"
                   maxLength={50}

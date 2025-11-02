@@ -287,36 +287,48 @@ const CreateTextPage = () => {
                       <div className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>
                         {['never', '5', '30', '1440', 'custom'].map((opt) => (
                           <button
-                            key={opt}
-                            type="button"
-                            onClick={() => {
-                              if (opt === 'custom') {
-                                setIsCustomExpiration(true);
-                              } else {
-                                setIsCustomExpiration(false);
-                                setExpiration(opt);
-                              }
-                              setIsDropdownOpen(false);
-                            }}
-                            className={`w-full px-3 sm:px-4 py-2 text-sm text-left hover:bg-indigo-100 ${
+                          key={opt}
+                          type="button"
+                          onClick={() => {
+                            if (opt === 'custom') {
+                              setIsCustomExpiration(true);
+                            } else {
+                              setIsCustomExpiration(false);
+                              setExpiration(opt);
+                            }
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`
+                            w-full 
+                            text-left
+                            px-2 sm:px-3 md:px-4 
+                            py-1.5 sm:py-2 
+                            text-xs sm:text-sm md:text-base 
+                            rounded-md 
+                            transition-colors 
+                            hover:bg-indigo-100 
+                            ${
                               theme === 'dark'
                                 ? 'text-white hover:bg-gray-600'
                                 : 'text-gray-900'
-                            } ${
+                            } 
+                            ${
                               (opt === expiration && !isCustomExpiration) ||
                               (opt === 'custom' && isCustomExpiration)
                                 ? 'bg-indigo-600 text-white'
                                 : ''
-                            }`}
-                          >
-                            {opt === 'never'
-                              ? 'Never expires'
-                              : opt === '1440'
-                              ? '24 hours'
-                              : opt === 'custom'
-                              ? 'Custom duration'
-                              : opt + ' minutes'}
-                          </button>
+                            }
+                          `}
+                        >
+                          {opt === 'never'
+                            ? 'Never expires'
+                            : opt === '1440'
+                            ? '24 hours'
+                            : opt === 'custom'
+                            ? 'Custom duration'
+                            : `${opt} minutes`}
+                        </button>
+
                         ))}
                       </div>
                     </div>

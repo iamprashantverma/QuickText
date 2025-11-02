@@ -270,7 +270,7 @@ const CreateTextPage = () => {
                     >
                       <span>
                         {oneTimeView
-                          ? 'Disabled for one-time'
+                          ? 'Disabled'
                           : isCustomExpiration
                           ? 'Custom duration'
                           : expiration === 'never'

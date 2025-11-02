@@ -35,7 +35,7 @@ const Home = () => {
             <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 ${
               theme === 'dark' ? 'bg-indigo-900' : 'bg-indigo-100'
             }`}>
-              <span className="text-3xl">⚡</span>
+          <span className="text-3xl text-blue-500">⚡</span>
             </div>
             <h3 className={`text-xl font-bold mb-2 ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -51,7 +51,7 @@ const Home = () => {
             <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 ${
               theme === 'dark' ? 'bg-green-900' : 'bg-green-100'
             }`}>
-              <span className="text-3xl">⏱️</span>
+              <span className="text-3xl">⌛</span>
             </div>
             <h3 className={`text-xl font-bold mb-2 ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -67,7 +67,7 @@ const Home = () => {
             <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 ${
               theme === 'dark' ? 'bg-purple-900' : 'bg-purple-100'
             }`}>
-              <span className="text-3xl">🔒</span>
+              <span className="text-3xl">🛡️</span>
             </div>
             <h3 className={`text-xl font-bold mb-2 ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'

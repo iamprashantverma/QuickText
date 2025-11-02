@@ -35,7 +35,7 @@ const SignupPage = () => {
     try {
         await signUp(formData);
         toast.success("Signup successful! You can now log in.");
-        navigate("/login")
+        navigate("/login",{replace:true});
         setFormData({ name: '',email: '', password: ''});
 
     } catch (err) {
@@ -166,6 +166,7 @@ const SignupPage = () => {
               Already have an account?{' '}
               <Link
                 to="/login"
+                replace
                 className={`${
                   theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-500'
                 }`}

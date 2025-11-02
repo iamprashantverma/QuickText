@@ -40,6 +40,7 @@ const LoginPage = () => {
       await login(formData);
       toast.success("Login Successfully")
       setFormData({email:'',password:''});
+      navigate("/",{replace:true});
     } catch (err) {
       let message = "Something went wrong. Please try again.";
       if (err?.response)
@@ -160,6 +161,7 @@ const LoginPage = () => {
               Don't have an account?{' '}
               <Link
                 to="/signup"
+                replace
                 className={`${
                   theme === 'dark'
                     ? 'text-indigo-400 hover:text-indigo-300'

@@ -33,3 +33,7 @@ export const deleteText = async (id) => {
 export const validateCustomURL = async (customLink) => {
   return await axios.post(`${API_BASE_URL}/validate-link`, { customLink }, withAuth());
 };
+
+export const getTextShareCount = async ()=>{
+  return await axios.get(`${API_BASE_URL}/count`);
+}

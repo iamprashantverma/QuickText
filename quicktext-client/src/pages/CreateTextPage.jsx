@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useTheme } from '../hooks/useTheme';
+import { Plus } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { createText, validateCustomURL } from '../services/api/textService';
 
@@ -19,6 +20,7 @@ const CreateTextPage = () => {
   const [isGenerated, setIsGenerated] = useState(false);
   const [generatedUrl, setGeneratedUrl] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -101,6 +103,10 @@ const CreateTextPage = () => {
       setIsGenerated(true);
       setIsAvailable(null);
       setCustomLink('');
+      
+      // Dispatch event to update count
+      window.dispatchEvent(new Event('textCreated'));
+      
       console.log('Response:', response.data);
     } catch (err) {
       let message = 'Something went wrong. Please try again.';
@@ -144,13 +150,75 @@ const CreateTextPage = () => {
           }`}
         >
           <div className="mb-3">
-            <label
-              className={`text-sm font-medium mb-2 block ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Paste your text or code here
-            </label>
+            {/* Label and Action Buttons Row */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+              <label
+                className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}
+              >
+                Paste your text or write  here
+              </label>
+              
+              {/* Action Buttons - Show when generated */}
+              {isGenerated && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(generatedUrl);
+                      setIsCopied(true);
+                      setShowPopup(true);
+                      setTimeout(() => {
+                        setIsCopied(false);
+                        setShowPopup(false);
+                      }, 2000);
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      isCopied
+                        ? 'bg-green-600 text-white'
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    }`}
+                  >
+                    {isCopied ? (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setContent('');
+                      setIsGenerated(false);
+                      setCustomLink('');
+                      setIsCustomExpiration(false);
+                      setOneTimeView(false);
+                      setExpiration('30');
+                      setCustomExpirationMinutes('');
+                      navigate('/');
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      theme === 'dark'
+                        ? 'bg-gray-700 text-white hover:bg-gray-600'
+                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                  >
+                    <Plus size={14} />
+                    <span>New</span>
+                  </button>
+                </div>
+              )}
+            </div>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -172,30 +240,32 @@ const CreateTextPage = () => {
               theme === 'dark' ? 'bg-gray-800' : 'bg-white'
             }`}
           >
-            <div className="flex flex-col md:flex-row md:flex-nowrap items-start md:items-end gap-3 sm:gap-4 mb-4">
-              {/* One Time View */}
-              <div className="md:w-1/4">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="oneTime"
-                    checked={oneTimeView}
-                    onChange={(e) => setOneTimeView(e.target.checked)}
-                    className="w-4 h-4 text-indigo-600 rounded"
-                  />
-                  <label
-                    htmlFor="oneTime"
-                    className={`${
-                      theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-                    } text-sm`}
-                  >
-                    One-time view
-                  </label>
+            <div className="flex flex-col gap-3 sm:gap-4 mb-4">
+              {/* First Row: One Time View, Expiration, and Generate Button */}
+              <div className="flex flex-col md:flex-row gap-4 items-start md:items-end">
+                {/* One Time View */}
+                <div className="w-full md:flex-1">
+                  <div className="flex items-center gap-2 h-full md:pb-2">
+                    <input
+                      type="checkbox"
+                      id="oneTime"
+                      checked={oneTimeView}
+                      onChange={(e) => setOneTimeView(e.target.checked)}
+                      className="w-4 h-4 text-indigo-600 rounded"
+                    />
+                    <label
+                      htmlFor="oneTime"
+                      className={`${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      } text-sm whitespace-nowrap`}
+                    >
+                      One-time view
+                    </label>
+                  </div>
                 </div>
-              </div>
 
-              {/* Expiration */}
-              <div className="md:w-1/4">
+                {/* Expiration */}
+                <div className="w-full md:flex-1">
                 <label
                   htmlFor="expiration"
                   className={`block text-xs font-medium mb-1 ${
@@ -211,7 +281,7 @@ const CreateTextPage = () => {
                         type="number"
                         min="5"
                         step="1"
-                        max="21600"
+                        max="259200"
                         value={customExpirationMinutes}
                         onChange={(e) => {
                           const value = e.target.value;
@@ -224,7 +294,7 @@ const CreateTextPage = () => {
                           let n = parseInt(customExpirationMinutes);
                           if (isNaN(n)) return;
                           if (n < 5) n = 5;
-                          if (n > 21600) n = 21600;
+                          if (n > 259200) n = 259200;
                           setCustomExpirationMinutes(String(n));
                         }}
                         placeholder="Min 5"
@@ -336,8 +406,20 @@ const CreateTextPage = () => {
                 </div>
               </div>
 
-              {/* Custom Link */}
-              <div className="md:flex-1">
+                {/* Generate Button */}
+                <div className="w-full md:flex-1">
+                  <button
+                    onClick={generateLink}
+                    disabled={loading || !content.trim() || (isAvailable != null && !isAvailable)}
+                    className="w-full px-4 sm:px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 text-xs sm:text-sm whitespace-nowrap"
+                  >
+                    {loading ? 'Generating...' : 'Generate Link'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Second Row: Custom Link */}
+              <div className="w-full">
                 <label
                   className={`block text-xs font-medium mb-1 ${
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
@@ -370,84 +452,52 @@ const CreateTextPage = () => {
                   }`}
                 />
               </div>
-
-              {/* Generate Button */}
-              <div className="md:ml-4 md:self-end w-full md:w-auto">
-                <button
-                  onClick={generateLink}
-                  disabled={loading || !content.trim() || (isAvailable != null && !isAvailable)}
-                  className="w-full md:w-auto px-4 sm:px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 text-xs sm:text-sm"
-                >
-                  {loading ? 'Generating...' : 'Generate Link'}
-                </button>
-              </div>
             </div>
           </div>
         )}
 
-        {/* After Generation */}
+        {/* Link Display - Show below content when generated */}
         {isGenerated && (
           <div
-            className={`rounded-xl shadow-lg p-4 mb-4 ${
+            className={`rounded-xl shadow-lg p-3 sm:p-4 mb-4 ${
               theme === 'dark' ? 'bg-gray-800' : 'bg-white'
             }`}
           >
-            <div className="mb-2">
-              <p
-                className={`${
-                  theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
-                } text-sm font-semibold`}
-              >
-                Share
-              </p>
-              <p
-                className={`${
-                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                } text-xs`}
-              >
-                Your link is ready. Copy and share it.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="text"
-                readOnly
-                value={generatedUrl}
-                className={`flex-1 px-3 py-2 border rounded-lg text-xs sm:text-sm ${
-                  theme === 'dark'
-                    ? 'bg-gray-700 text-white border-gray-600'
-                    : 'bg-white text-gray-900 border-gray-300'
-                }`}
-              />
+            <label
+              className={`block text-xs sm:text-sm font-medium mb-2 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}
+            >
+              Your shareable link
+            </label>
+            <div className="relative">
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(generatedUrl);
                   setShowPopup(true);
                   setTimeout(() => setShowPopup(false), 1200);
                 }}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm"
-              >
-                Copy
-              </button>
-              <button
-                onClick={() => {
-                  setContent('');
-                  setIsGenerated(false);
-                  setCustomLink('');
-                  setIsCustomExpiration(false);
-                  setOneTimeView(false);
-                  setExpiration('30');
-                  setCustomExpirationMinutes('');
-                  navigate('/');
-                }}
-                className={`px-4 py-2 rounded-lg text-xs sm:text-sm ${
-                  theme === 'dark'
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-100 text-gray-800'
+                className={`absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                 }`}
+                title="Copy link"
               >
-                Create another
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
               </button>
+              <input
+                type="text"
+                readOnly
+                value={generatedUrl}
+                onClick={(e) => e.target.select()}
+                className={`w-full pl-10 pr-3 py-2 sm:py-2.5 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  theme === 'dark'
+                    ? 'bg-gray-700 text-white border-gray-600'
+                    : 'bg-white text-gray-900 border-gray-300'
+                }`}
+              />
             </div>
           </div>
         )}

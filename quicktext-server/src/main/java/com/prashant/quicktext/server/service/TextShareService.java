@@ -9,14 +9,16 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public interface TextShareService {
+
     TextShareDTO createText(@Valid TextShareDTO textShareDTO);
 
     TextShareDTO getTextById(String id);
 
     List<TextShareDTO> getAllTexts();
 
-
     void deleteText(String id);
 
     ValidateLinkDTO validateCustomLink(ValidateLinkDTO customLink);
+
+
 }

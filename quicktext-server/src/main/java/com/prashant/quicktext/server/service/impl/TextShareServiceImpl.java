@@ -9,6 +9,7 @@ import com.prashant.quicktext.server.exception.CustomLinkAlreadyExistsException;
 import com.prashant.quicktext.server.exception.TextNotFoundException;
 import com.prashant.quicktext.server.repository.ArchivedTextRepository;
 import com.prashant.quicktext.server.repository.TextShareRepository;
+import com.prashant.quicktext.server.service.CounterService;
 import com.prashant.quicktext.server.service.TextShareService;
 import com.prashant.quicktext.server.util.AppUtil;
 import com.prashant.quicktext.server.util.AuthUtil;
@@ -23,16 +24,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class TextShareServiceImpl implements TextShareService {
-    private static final String[] blockedLinks = {"login","signup","dashboard","create"};
+    private static final Set<String> BLOCKED_LINKS = Set.of("login", "signup", "dashboard", "create", "count", "texts", "validate-link");
+
     private final ModelMapper modelMapper;
     private final TextShareRepository textShareRepository;
     private final AuthUtil authUtil;
     private final ArchivedTextRepository archivedTextRepository;
+    private final CounterService counterService;
 
     @Override
     @Transactional
@@ -48,9 +52,10 @@ public class TextShareServiceImpl implements TextShareService {
                     "The custom link '" + customLink + "' is already registered by another user."
             );
         }
-
-        boolean isBlockedLink = Arrays.asList(blockedLinks).contains(customLink);
-
+        boolean isBlockedLink = false;
+        if (customLink != null) {
+            isBlockedLink = BLOCKED_LINKS.contains(customLink);
+        }
         if (isBlockedLink)
             throw new CustomLinkAlreadyExistsException(
                     "The custom link '" + customLink + "' is already registered by another user."
@@ -79,9 +84,10 @@ public class TextShareServiceImpl implements TextShareService {
         textShare.setUser(currentUser);
 
         log.info("current User:{}",currentUser);
-
         //  Save entity and return DTO
         TextShare savedTextShare = textShareRepository.save(textShare);
+        counterService.incrementCounter();
+
         return convertToTextShareDTO(savedTextShare);
     }
 
@@ -156,7 +162,7 @@ public class TextShareServiceImpl implements TextShareService {
 
         String link = validateLinkDTO.getCustomLink().toLowerCase();
         boolean exists = textShareRepository.existsByLink(link);
-        boolean isBlockedLink = Arrays.asList(blockedLinks).contains(link);
+        boolean isBlockedLink = BLOCKED_LINKS.contains(link);
         if (isBlockedLink)
             exists = true;
         return ValidateLinkDTO.builder()

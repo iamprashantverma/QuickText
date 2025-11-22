@@ -1,7 +1,9 @@
 package com.prashant.quicktext.server.controller;
 
+import com.prashant.quicktext.server.dto.CounterDTO;
 import com.prashant.quicktext.server.dto.TextShareDTO;
 import com.prashant.quicktext.server.dto.ValidateLinkDTO;
+import com.prashant.quicktext.server.service.CounterService;
 import com.prashant.quicktext.server.service.TextShareService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.List;
 public class TextShareController {
 
     private final TextShareService textShareService;
+    private final CounterService counterService;
 
     @PostMapping("/create")
     public ResponseEntity<TextShareDTO> createSharedText(@Valid  @RequestBody TextShareDTO textShareDTO) {
@@ -48,6 +51,12 @@ public class TextShareController {
     public ResponseEntity<ValidateLinkDTO> validateCustomLink(@Valid @RequestBody ValidateLinkDTO requestDTO) {
         ValidateLinkDTO resp = textShareService.validateCustomLink(requestDTO);
         return ResponseEntity.ok(resp);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<CounterDTO> getTextShareCount() {
+        CounterDTO counter = counterService.getTextShareCount();
+        return ResponseEntity.ok(counter);
     }
 
 }

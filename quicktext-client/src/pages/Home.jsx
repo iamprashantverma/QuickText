@@ -94,8 +94,8 @@ const Home = () => {
               <div 
                 className={`absolute inset-0 rounded-2xl shadow-xl p-6 sm:p-7 flex flex-col transition-all ${
                   theme === 'dark' 
-                    ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' 
-                    : 'bg-gradient-to-br from-white to-gray-50'
+                    ? 'bg-linear-to-br from-gray-800 to-gray-900 border border-gray-700' 
+                    : 'bg-linear-to-br from-white to-gray-50'
                 }`}
                 style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
               >
@@ -121,13 +121,13 @@ const Home = () => {
               <div 
                 className={`absolute inset-0 rounded-2xl shadow-2xl p-3 sm:p-4 flex flex-col overflow-hidden ${
                   theme === 'dark' 
-                    ? 'bg-gradient-to-br from-indigo-900 via-indigo-800 to-blue-900 border-2 border-indigo-600' 
-                    : 'bg-gradient-to-br from-indigo-100 via-indigo-50 to-blue-100 border-2 border-indigo-400'
+                    ? 'bg-linear-to-br from-indigo-900 via-indigo-800 to-blue-900 border-2 border-indigo-600' 
+                    : 'bg-linear-to-br from-indigo-100 via-indigo-50 to-blue-100 border-2 border-indigo-400'
                 }`}
                 style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 <div className="flex items-center gap-1.5 mb-2">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                     theme === 'dark' ? 'bg-indigo-700' : 'bg-indigo-200'
                   }`}>
                     <span className="text-lg">⚡</span>
@@ -141,7 +141,7 @@ const Home = () => {
                     <div key={i} className={`flex items-center gap-1.5 p-1.5 rounded ${
                       theme === 'dark' ? 'bg-indigo-800/50' : 'bg-white/70'
                     }`}>
-                      <span className="text-green-500 text-[10px] flex-shrink-0">✓</span>
+                      <span className="text-green-500 text-[10px] shrink-0">✓</span>
                       <span className={`text-[10px] ${
                         theme === 'dark' ? 'text-indigo-100' : 'text-indigo-900'
                       }`}>{item}</span>
@@ -179,8 +179,8 @@ const Home = () => {
               <div 
                 className={`absolute inset-0 rounded-2xl shadow-xl p-6 sm:p-7 flex flex-col transition-all ${
                   theme === 'dark' 
-                    ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' 
-                    : 'bg-gradient-to-br from-white to-gray-50'
+                    ? 'bg-linear-to-br from-gray-800 to-gray-900 border border-gray-700' 
+                    : 'bg-linear-to-br from-white to-gray-50'
                 }`}
                 style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
               >
@@ -206,13 +206,13 @@ const Home = () => {
               <div 
                 className={`absolute inset-0 rounded-2xl shadow-2xl p-3 sm:p-4 flex flex-col overflow-hidden ${
                   theme === 'dark' 
-                    ? 'bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 border-2 border-green-600' 
-                    : 'bg-gradient-to-br from-green-100 via-green-50 to-emerald-100 border-2 border-green-400'
+                    ? 'bg-linear-to-br from-green-900 via-green-800 to-emerald-900 border-2 border-green-600' 
+                    : 'bg-linear-to-br from-green-100 via-green-50 to-emerald-100 border-2 border-green-400'
                 }`}
                 style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 <div className="flex items-center gap-1.5 mb-2">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                     theme === 'dark' ? 'bg-green-700' : 'bg-green-200'
                   }`}>
                     <span className="text-lg">⌛</span>
@@ -264,8 +264,8 @@ const Home = () => {
               <div 
                 className={`absolute inset-0 rounded-2xl shadow-xl p-6 sm:p-7 flex flex-col transition-all ${
                   theme === 'dark' 
-                    ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' 
-                    : 'bg-gradient-to-br from-white to-gray-50'
+                    ? 'bg-linear-to-br from-gray-800 to-gray-900 border border-gray-700' 
+                    : 'bg-linear-to-br from-white to-gray-50'
                 }`}
                 style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
               >
@@ -291,8 +291,8 @@ const Home = () => {
               <div 
                 className={`absolute inset-0 rounded-2xl shadow-2xl p-3 sm:p-4 flex flex-col overflow-hidden ${
                   theme === 'dark' 
-                    ? 'bg-gradient-to-br from-purple-900 via-purple-800 to-violet-900 border-2 border-purple-600' 
-                    : 'bg-gradient-to-br from-purple-100 via-purple-50 to-violet-100 border-2 border-purple-400'
+                    ? 'bg-linear-to-br from-purple-900 via-purple-800 to-violet-900 border-2 border-purple-600' 
+                    : 'bg-linear-to-br from-purple-100 via-purple-50 to-violet-100 border-2 border-purple-400'
                 }`}
                 style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
@@ -311,7 +311,7 @@ const Home = () => {
                     <div key={i} className={`flex items-center gap-1.5 p-1.5 rounded ${
                       theme === 'dark' ? 'bg-purple-800/50' : 'bg-white/70'
                     }`}>
-                      <span className="text-green-500 text-[10px] flex-shrink-0">✓</span>
+                      <span className="text-green-500 text-[10px] shrink-0">✓</span>
                       <span className={`text-[10px] ${
                         theme === 'dark' ? 'text-purple-100' : 'text-purple-900'
                       }`}>{item}</span>

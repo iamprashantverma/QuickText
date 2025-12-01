@@ -433,7 +433,7 @@ const CreateTextPage = () => {
                   onChange={(e) =>
                     setCustomLink(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
                   }
-                  placeholder="quicktext/prashant-note"
+                  placeholder="quicktext.prashulab.space/Hello"
                   maxLength={50}
                   className={`w-full px-3 sm:px-4 py-2 border rounded-lg focus:ring-2 text-xs sm:text-sm ${
                     theme === 'dark'
